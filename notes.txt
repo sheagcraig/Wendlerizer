@@ -1,0 +1,86 @@
+NOTES:
+
+1. What is that + sign for?
+The most important part of this program is the work sets. These are the 531
+lifts, usually the A and C elements of each days workout. 
+
+The plus means do as many reps as possible, with the preceding number
+indicating a minimum number of reps.
+
+For example,when you see:
+'Squat 5, 5, 5+ @ 200, 225, 250'
+
+this means to perform three sets of squats.
+The first set is 5 reps at 200. 
+The second set is 5 reps at 225. 
+The third set, do as many reps as possible at 250, getting at least 5 reps.
+
+Record the number of reps you got on your training plan. It's an important
+metric for determining how you are doing. Also, it's fun to try to hit new
+3, 5, and 10 rep maxes as often as possible.
+
+If you completely fail to get the required reps, let the coach know. Some
+adjustments may be necessary. In general, however, you should be able to get
+the required reps, and probably several more. It will be hard. All good things
+are.
+
+That being said, we generally consider it to be counterproductive to overdo
+it. So we usually absolutely cap the reps at 10, and probably more like 10
+on the 5+ day, 6 or 8 on the 3+ day, and 5 on the 1+ day. It just depends on
+how badly you want it.
+
+2. Optional 'Joker' sets
+On any lift, after performing the 531 lift, but before dropping back down for
+the volume (usually the B and D parts of the workout), if you are feeling
+spicy, or you want to refamiliarize/practice with heavy weights, you will
+perform Joker sets.
+
+Add 5-10% of your training max and do another set of 5, 3, or 1, depending on
+which training week it is. If you get all the reps, continue adding 5-10% until
+you cannot get the reps.
+
+Then add 5-10% and do singles until you can't. Try not to fail any lifts. Use
+good judgement. Then proceed to the down sets.
+
+3. Efficiency and Falling Behind
+This is a lot to get done in 60 minutes. Here are some tips to help you make
+it:
+
+Barbell Club starts lifting at 6 at the latest! Please do your mobilizing and
+warmup PRIOR to class!
+
+Each training day focuses on two major lifts: Back Squat and Press on day 1,
+and Deadlift and Bench Press on day 2. Try to finish your first cluster of 
+lifts by half past, and your second cluster of lifts by 7.
+
+Everybody loves conditioning wods, but we may not always have time for them. 
+So they are optional. Barbell club is FREE for the duration of the PR
+challenge to registered participants, so just come to regular classes to get
+your WOD on. You may find that max reps at 95% of your training max is indeed
+a heavy-breathing inducing experience.
+
+If you can't come twice a week to barbell club, or run out of time and don't
+make it through the entire workout, fear not! As mentioned before, the 531
+lifts are the most important part of this program. The other lifts add volume
+and help catalyze your development, but they aren't strictly necessary.
+
+So if you fall behind, feel free to roll in 20-30 minutes prior to a class or
+during open gym to get a 531 lift in. For example, if you missed a Thursday,
+you could show up early for a Friday class and do:
+Deadlift 3, 3, 3+ @ 360, 385, 410
+
+Also, since we're not testing bench press as part of this challenge, make it
+the first thing to toss out if you fall behind (that's why it's the last lift
+of the week!)
+
+4. Helping the coaches
+Keep your plan with you, and mark off, preferably in red pen, each lift as
+you do them, including the number of reps on your max reps sets.
+
+5. How many sets and reps should I do for...
+Ranges are usually given. Use how you are feeling to determine whether to go
+for more or less sets. More isn't always better. Just most of the time.
+
+6. But wait, this plan is 9 weeks long...
+And the challenge is 8 weeks. That's okay. Take it easy perhaps for the
+few days before the final testing day. Skip the deadlifts for sure.
