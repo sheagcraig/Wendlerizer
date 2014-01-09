@@ -6,7 +6,7 @@
 import readline
 
 class TrainingProgram(object):
-    '''Represents a complete lifting program, with methods for outputting 
+    '''Represents a complete lifting program, with methods for outputting
     it nicely.
     '''
     def __init__(self, **kwargs):
@@ -89,12 +89,30 @@ class TrainingProgram(object):
         week, 3=5, 3, 1+ week, 4=rest week, and X=increase the training maxes.
 
         Assistance work is included by adding in assistance functions.
-        Each assistance function should conform to the Assistance class.
 
-        assistance_funcs should be a list of assistance functions and their
-        keyword arguments. 
+        assistance_funcs should be a list; each item in the list
+        corresponds to one element or superset of the workout (an A., B., etc).
 
-        Supersets can be included by making a list of lists.
+        Even if not supersetting, each list item needs to also be a list,
+        in order, of the movement or movements to include. These items should
+        also be lists, composed of the function to call, and it's extra_args.
+
+        So all told, the assistance_funcs list will be three levels deep.
+
+        i.e.:
+
+        assistance_funcs = [
+                                [element B stuff...
+                                    [Supersetted movement 1, extra_args]
+                                    [Supersetted movement 2, extra_args]
+                                ]
+                                [element C stuff...
+                                    [Individual movement 1, extra_args]
+                                ]
+                            ]
+
+        Each assistance function should accept as input tm, week, and a
+        dict of extra_args, to which this method will add a key of 'lift' to.
 
         '''
         ctr = 1
@@ -109,7 +127,9 @@ class TrainingProgram(object):
             for lift, tm in self.TMs.items():
                 element = 'A'
                 self.plan += "%s Workout\n" % lift
-                self.plan += "A. %s %s\n" % (lift, self.generate_531_weights(tm, week))
+                self.plan += "A. %s %s\n" % (lift,
+                                             self.generate_531_weights(tm,
+                                                                       week))
                 if not week == 4:
                     for superset in assistance_funcs:
                         element = chr(ord(element) + 1)
@@ -125,11 +145,10 @@ class TrainingProgram(object):
 
                         sub = '1'
                         for temp in superset_text:
-                            
                             output_string = element
                             if len(superset_text) > 1:
-                               output_string += sub
-                               sub = str(int(sub) + 1)
+                                output_string += sub
+                                sub = str(int(sub) + 1)
 
                             output_string += ". %s\n" % temp
 
@@ -139,9 +158,8 @@ class TrainingProgram(object):
 
             ctr += 1
             self.plan += '\n'
-                
-        return self.plan
 
+        return self.plan
 
     def generate_training_cycle_old(self, cycle):
         '''Generate one cycle of training.'''
@@ -180,9 +198,12 @@ class TrainingProgram(object):
         week += "B. Deadlift 3-5 sets of 5-8 reps @ %s\n" % \
                 round_weight(self.TMs['Deadlift'] * 0.65)
         week += "C. Bench Press 5, 5, 5+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Bench Press'] * 0.65),
-                                  round_weight(self.TMs['Bench Press'] * 0.75),
-                                  round_weight(self.TMs['Bench Press'] * 0.85))
+                "@ %s, %s, %s\n" % (round_weight(self.TMs['Bench Press'] *
+                                                 0.65),
+                                  round_weight(self.TMs['Bench Press'] *
+                                               0.75),
+                                  round_weight(self.TMs['Bench Press'] *
+                                               0.85))
         week += "D1. Bench Press 3-5 sets of 5-8 reps @ %s\n" % \
                 round_weight(self.TMs['Bench Press'] * 0.65)
         week += "D2. Strict Pullup or DB Row or BB row 5 x 10\n"
@@ -260,7 +281,8 @@ class TrainingProgram(object):
         week += "B. Deadlift 3-5 sets of 5-8 reps @ %s\n" % \
                 round_weight(self.TMs['Deadlift'] * 0.75)
         week += "C. Bench Press 3, 3, 3+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Bench Press'] * 0.75),
+                "@ %s, %s, %s\n" % (round_weight(self.TMs['Bench Press'] *
+                                                 0.75),
                                   round_weight(self.TMs['Bench Press'] * 0.85),
                                   round_weight(self.TMs['Bench Press'] * 0.95))
         week += "D1. Bench Press 3-5 sets of 5-8 reps @ %s\n" % \
@@ -279,7 +301,7 @@ class TrainingProgram(object):
     def write_training_plan(self):
         '''Output a text file with training plan.'''
         with open('%s.txt' % self.name, 'w') as f:
-            f.write(self.plan + '\n\n' +  self.training_notes() + '\n\n' + 
+            f.write(self.plan + '\n\n' +  self.training_notes() + '\n\n' +
                     unicorn())
 
     def training_notes(self):
@@ -310,7 +332,8 @@ def generate_boring_but_big_weight(tm, week, extra_args):
     else:
         percentage = extra_args['percentage']
 
-    return "%s 5 x 10 @ %i" % (extra_args['lift'], round_weight(tm * percentage))
+    return "%s 5 x 10 @ %i" % (extra_args['lift'],
+                               round_weight(tm * percentage))
 
 
 def generate_assistance_assistance(tm, week, extra_args):
@@ -320,10 +343,10 @@ def generate_assistance_assistance(tm, week, extra_args):
     Required keyword arguments are:
         lift = (Squat, Deadlift, Press, Bench Press)
         work = Dictionary with above lifts as key, and value should be string
-                of sets and reps
-    
+                of sets and reps. If value is an empty string, that lift will
+                not be supersetted.
+
     '''
-    
     lift = extra_args['lift']
     output = "%s" % extra_args[lift]
     #if 'percentage' in kwargs['work'][lift].keys():
@@ -337,13 +360,13 @@ def generate_jake_set(tm, week, extra_args):
 
 
 def estimate_1RM(rep_max):
-    '''Given a rep max in the form of repsXweight, calculate an estimated 
+    '''Given a rep max in the form of repsXweight, calculate an estimated
     1RM.
     '''
     reps, x, weight = rep_max.upper().partition('X')
     est1rm = int(weight) * int(reps) * 0.0333 + int(weight)
     return int(round_weight(est1rm))
-    
+
 
 def round_weight(weight, precision=5.0):
     '''A simple rounding algorithm specifically for weights. You can override
@@ -363,6 +386,7 @@ def unicorn():
 
 
 def line():
+    '''Return a nice line'''
     return 79 * '*' + '\n'
 
 
