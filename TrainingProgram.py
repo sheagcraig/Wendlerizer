@@ -9,19 +9,28 @@ class TrainingProgram(object):
     '''Represents a complete lifting program, with methods for outputting 
     it nicely.
     '''
-    def __init__(self):
+    def __init__(self, **kwargs):
         '''Generate our plan.'''
-        self.PRs = {'Squat': 0,
-                    'Press': 0,
-                    'Deadlift': 0,
-                    'Bench Press': 0}
+        if len(kwargs) == 5:
+            self.PRs = {'Squat': kwargs['Squat'],
+                        'Press': kwargs['Press'],
+                        'Deadlift': kwargs['Deadlift'],
+                        'Bench Press': kwargs['BenchPress']}
+            self.name = kwargs['Name']
+        else:
+            self.PRs = {'Squat': 0,
+                        'Press': 0,
+                        'Deadlift': 0,
+                        'Bench Press': 0}
+            self.read_PRs()
+
         self.TMs = {'Squat': 0,
                     'Press': 0,
                     'Deadlift': 0,
                     'Bench Press': 0}
 
-        self.read_PRs()
         self.generate_TMs()
+
         self.plan = "Training Plan for %s\n\n" % self.name
 
     def read_PRs(self):
@@ -50,19 +59,91 @@ class TrainingProgram(object):
         self.TMs['Press'] += 5
         self.TMs['Bench Press'] += 5
 
-    def generate_531_cycle(self, tm, week):
-        '''Given a training max, and a week of the cycle, return a tuple of
-        weights to lift. Week=1=5, 5, 5+; 2=3, 3, 3+; 3=5, 3, 1+.
+    def generate_531_weights(self, tm, week):
+        '''Given a training max, and a week of the cycle, return a string of
+        weights to lift for reps. Week=1=5, 5, 5+; 2=3, 3, 3+; 3=5, 3, 1+.
         '''
         if week == 1:
-            return (round_weight(tm * 0.65), round_weight(tm * 0.75), round_weight(tm * 0.85))
+            weights = "5, 5, 5+ @ %i %i %i" % (round_weight(tm * 0.65),
+                                               round_weight(tm * 0.75),
+                                               round_weight(tm * 0.85))
         elif week == 2:
-            return (round_weight(tm * 0.7), round_weight(tm * 0.8), round_weight(tm * 0.9))
+            weights = "3, 3, 3+ @ %i %i %i" % (round_weight(tm * 0.7),
+                                               round_weight(tm * 0.8),
+                                               round_weight(tm * 0.9))
+        elif week == 3:
+            weights = "5, 3, 1+ @ %i %i %i" % (round_weight(tm * 0.75),
+                                               round_weight(tm * 0.85),
+                                               round_weight(tm * 0.95))
         else:
-            return (round_weight(tm * 0.75), round_weight(tm * 0.85), round_weight(tm * 0.95))
+            # Rest week
+            weights = "5, 5, 5 @ %i %i %i" % (round_weight(tm * 0.4),
+                                              round_weight(tm * 0.5),
+                                              round_weight(tm * 0.6))
+        return weights
+
+    def generate_training_cycle(self, week_pattern, assistance_funcs):
+        '''Generate a complete training program.
+
+        week_pattern should be a tuple of week codes where 1=3x5 week, 2=3x3
+        week, 3=5, 3, 1+ week, 4=rest week, and X=increase the training maxes.
+
+        Assistance work is included by adding in assistance functions.
+        Each assistance function should conform to the Assistance class.
+
+        assistance_funcs should be a list of assistance functions and their
+        keyword arguments. 
+
+        Supersets can be included by making a list of lists.
+
+        '''
+        ctr = 1
+        for week in week_pattern:
+            if week == 'X':
+                self.increment_TMs()
+                continue
+
+            self.plan += "Week %i\n" % ctr
+            self.plan += line() + '\n'
+
+            for lift, tm in self.TMs.items():
+                element = 'A'
+                self.plan += "%s Workout\n" % lift
+                self.plan += "A. %s %s\n" % (lift, self.generate_531_weights(tm, week))
+                if not week == 4:
+                    for superset in assistance_funcs:
+                        element = chr(ord(element) + 1)
+
+                        superset_text = []
+                        for assistance in superset:
+                            extra_args = assistance[1]
+                            extra_args['lift'] = lift
+                            output = assistance[0](tm, week, extra_args)
+
+                            if not output == '':
+                                superset_text.append(output)
+
+                        sub = '1'
+                        for temp in superset_text:
+                            
+                            output_string = element
+                            if len(superset_text) > 1:
+                               output_string += sub
+                               sub = str(int(sub) + 1)
+
+                            output_string += ". %s\n" % temp
+
+                            self.plan += output_string
+
+                self.plan += '\n'
+
+            ctr += 1
+            self.plan += '\n'
+                
+        return self.plan
 
 
-    def generate_training_cycle(self, cycle):
+    def generate_training_cycle_old(self, cycle):
         '''Generate one cycle of training.'''
         self.plan += 'Cycle %i\n\n' % cycle
         self.plan += 'Training maxes:\n'
@@ -210,6 +291,51 @@ class TrainingProgram(object):
         return read_data
 
 
+def generate_last_set_first_weight(tm, week, extra_args):
+    '''Return the last set first weight for backoff sets.'''
+    if week == 1:
+        weight = round_weight(tm * 0.65)
+    elif week == 2:
+        weight = round_weight(tm * 0.7)
+    else:
+        weight = round_weight(tm * 0.75)
+
+    return "%s 3-5 sets of 5-8 reps @ %i" % (extra_args['lift'], weight)
+
+
+def generate_boring_but_big_weight(tm, week, extra_args):
+    '''Return the BBB weight to use. Defaults to 50%.'''
+    if not 'percentage' in extra_args.keys():
+        percentage = 0.5
+    else:
+        percentage = extra_args['percentage']
+
+    return "%s 5 x 10 @ %i" % (extra_args['lift'], round_weight(tm * percentage))
+
+
+def generate_assistance_assistance(tm, week, extra_args):
+    '''Based on a lift, return an associated accessory protocol.
+    Primarily for supersetting pullups with pressing assistance.
+
+    Required keyword arguments are:
+        lift = (Squat, Deadlift, Press, Bench Press)
+        work = Dictionary with above lifts as key, and value should be string
+                of sets and reps
+    
+    '''
+    
+    lift = extra_args['lift']
+    output = "%s" % extra_args[lift]
+    #if 'percentage' in kwargs['work'][lift].keys():
+    #    output += " @ %i" % round_weight(tm * percentage)
+    return output
+
+
+def generate_jake_set(tm, week, extra_args):
+    '''Just returns a jake set'''
+    return "%s Jake set" % extra_args['lift']
+
+
 def estimate_1RM(rep_max):
     '''Given a rep max in the form of repsXweight, calculate an estimated 
     1RM.
@@ -241,9 +367,7 @@ def line():
 
 
 def main():
-    #Testing
-    tp = TrainingProgram()
-    print(tp.generate_531_cycle(tp.TMs['Squat'], 1))
+    pass
 
 
 if __name__ == '__main__':
