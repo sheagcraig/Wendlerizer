@@ -64,20 +64,20 @@ class TrainingProgram(object):
         weights to lift for reps. Week=1=5, 5, 5+; 2=3, 3, 3+; 3=5, 3, 1+.
         '''
         if week == 1:
-            weights = "5, 5, 5+ @ %i %i %i" % (round_weight(tm * 0.65),
+            weights = "5, 5, 5+ @ %i, %i, %i" % (round_weight(tm * 0.65),
                                                round_weight(tm * 0.75),
                                                round_weight(tm * 0.85))
         elif week == 2:
-            weights = "3, 3, 3+ @ %i %i %i" % (round_weight(tm * 0.7),
+            weights = "3, 3, 3+ @ %i, %i, %i" % (round_weight(tm * 0.7),
                                                round_weight(tm * 0.8),
                                                round_weight(tm * 0.9))
         elif week == 3:
-            weights = "5, 3, 1+ @ %i %i %i" % (round_weight(tm * 0.75),
+            weights = "5, 3, 1+ @ %i, %i, %i" % (round_weight(tm * 0.75),
                                                round_weight(tm * 0.85),
                                                round_weight(tm * 0.95))
         else:
             # Rest week
-            weights = "5, 5, 5 @ %i %i %i" % (round_weight(tm * 0.4),
+            weights = "5, 5, 5 @ %i, %i, %i" % (round_weight(tm * 0.4),
                                               round_weight(tm * 0.5),
                                               round_weight(tm * 0.6))
         return weights

@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-# Given input for max lifts, produce a BBC training program using Jim
-# Wendler's 531 program, and specifically implementing new protocols from
-# Beyond 531
+# Generate a training program for Shea (and for testing)
 
 import TrainingProgram as TP
 
