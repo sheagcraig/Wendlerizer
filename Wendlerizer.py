@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Generate a 531 program
+# Generate a 531 program for our CrossFit Total PR Challenge
 # Uses the First Set Last assistance program
 
 import TrainingProgram as TP
