@@ -3,7 +3,9 @@
 # Uses the First Set Last assistance program
 
 import TrainingProgram as TP
-
+import os
+ospjdf = os.path.join(os.path.dirname(__file__))
+os.chdir(ospjdf)
 
 def main():
     tp = TP.TrainingProgram()
