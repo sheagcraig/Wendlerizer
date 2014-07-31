@@ -3,7 +3,6 @@
 # Uses the First Set Last assistance program
 
 import TrainingProgram as TP
-import os
 
 chdir(path.dirname(path.abspath(argv[0])))
 
