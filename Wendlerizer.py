@@ -2,10 +2,12 @@
 # Generate a 531 program for our CrossFit Total PR Challenge
 # Uses the First Set Last assistance program
 
+from sys import argv
+from os import chdir
+from os import path
 import TrainingProgram as TP
-import os
-ospjdf = os.path.join(os.path.dirname(__file__))
-os.chdir(ospjdf)
+
+chdir(path.dirname(path.abspath(argv[0])))
 
 def main():
     tp = TP.TrainingProgram()
