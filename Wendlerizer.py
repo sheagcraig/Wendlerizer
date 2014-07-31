@@ -4,8 +4,8 @@
 
 import TrainingProgram as TP
 import os
-ospjdf = os.path.join(os.path.dirname(__file__))
-os.chdir(ospjdf)
+
+chdir(path.dirname(path.abspath(argv[0])))
 
 def main():
     tp = TP.TrainingProgram()
