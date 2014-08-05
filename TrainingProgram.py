@@ -1,7 +1,25 @@
 #!/usr/bin/env python
-# Given input for max lifts, produce a BBC training program using Jim
-# Wendler's 531 program, and specifically implementing new protocols from
-# Beyond 531
+"""
+Given input for max lifts, produce a BBC training program using Jim
+Wendler's 531 program, and specifically implementing new protocols from
+Beyond 531
+
+Copyright (C) 2013 Shea G Craig <shea.craig@da.org>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
 
 import readline
 
@@ -161,139 +179,6 @@ class TrainingProgram(object):
             self.plan += '\n'
 
         return self.plan
-
-    def generate_training_cycle_old(self, cycle):
-        '''Generate one cycle of training.'''
-        self.plan += 'Cycle %i\n\n' % cycle
-        self.plan += 'Training maxes:\n'
-        self.plan += 'Squat: %s\n' % self.TMs['Squat']
-        self.plan += 'Press: %s\n' % self.TMs['Press']
-        self.plan += 'Deadlift: %s\n' % self.TMs['Deadlift']
-        self.plan += 'Bench Press: %s\n\n' % self.TMs['Bench Press']
-
-        week = "Week 1\n"
-        week += line()
-        week += "Day 1:\n"
-        week += "A. Squat 5, 5, 5+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Squat'] * 0.65),
-                                  round_weight(self.TMs['Squat'] * 0.75),
-                                  round_weight(self.TMs['Squat'] * 0.85))
-        week += "B. Squat 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Squat'] * 0.65)
-        week += "C. Press 5, 5, 5+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Press'] * 0.65),
-                                  round_weight(self.TMs['Press'] * 0.75),
-                                  round_weight(self.TMs['Press'] * 0.85))
-        week += "D1. Press 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Press'] * 0.65)
-        week += "D2. Strict Pullup or DB Row or BB row 5 x 10\n"
-        week += "E. Ab exercises 3-5 x 10-20\n"
-        week += "F. Conditioning\n\n"
-
-        week += line()
-        week += "Day 2:\n"
-        week += "A. Deadlift 5, 5, 5+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Deadlift'] * 0.65),
-                                  round_weight(self.TMs['Deadlift'] * 0.75),
-                                  round_weight(self.TMs['Deadlift'] * 0.85))
-        week += "B. Deadlift 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Deadlift'] * 0.65)
-        week += "C. Bench Press 5, 5, 5+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Bench Press'] *
-                                                 0.65),
-                                  round_weight(self.TMs['Bench Press'] *
-                                               0.75),
-                                  round_weight(self.TMs['Bench Press'] *
-                                               0.85))
-        week += "D1. Bench Press 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Bench Press'] * 0.65)
-        week += "D2. Strict Pullup or DB Row or BB row 5 x 10\n"
-        week += "E1. Reverse Hyper, or GH Raise or Back Extension 3-5 x\n"
-        week += "E2. DB Kurlz or OH Triceps Extensions: 3-5 x 10\n"
-        week += "F. Conditioning\n\n"
-
-        self.plan += week
-
-        week = "Week 2\n"
-        week += line()
-        week += "Day 1:\n"
-        week += "A. Squat 3, 3, 3+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Squat'] * 0.7),
-                                  round_weight(self.TMs['Squat'] * 0.8),
-                                  round_weight(self.TMs['Squat'] * 0.9))
-        week += "B. Squat 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Squat'] * 0.7)
-        week += "C. Press 3, 3, 3+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Press'] * 0.7),
-                                  round_weight(self.TMs['Press'] * 0.8),
-                                  round_weight(self.TMs['Press'] * 0.9))
-        week += "D1. Press 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Press'] * 0.7)
-        week += "D2. Strict Pullup or DB Row or BB row 5 x 10\n"
-        week += "E. Ab exercises 3-5 x 10-20\n"
-        week += "F. Conditioning\n\n"
-
-        week += line()
-        week += "Day 2:\n"
-        week += "A. Deadlift 3, 3, 3+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Deadlift'] * 0.7),
-                                  round_weight(self.TMs['Deadlift'] * 0.8),
-                                  round_weight(self.TMs['Deadlift'] * 0.9))
-        week += "B. Deadlift 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Deadlift'] * 0.7)
-        week += "C. Bench Press 3, 3, 3+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Bench Press'] * 0.7),
-                                  round_weight(self.TMs['Bench Press'] * 0.8),
-                                  round_weight(self.TMs['Bench Press'] * 0.9))
-        week += "D1. Bench Press 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Bench Press'] * 0.7)
-        week += "D2. Strict Pullup or DB Row or BB row 5 x 10\n"
-        week += "E1. Reverse Hyper, or GH Raise or Back Extension 3-5 x\n"
-        week += "E2. DB Kurlz or OH Triceps Extensions: 3-5 x 10\n"
-        week += "F. Conditioning\n\n"
-
-        self.plan += week
-
-        week = "Week 3\n"
-        week += line()
-        week += "Day 1:\n"
-        week += "A. Squat 5, 3, 1+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Squat'] * 0.75),
-                                  round_weight(self.TMs['Squat'] * 0.85),
-                                  round_weight(self.TMs['Squat'] * 0.95))
-        week += "B. Squat 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Squat'] * 0.75)
-        week += "C. Press 5, 3, 1+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Press'] * 0.75),
-                                  round_weight(self.TMs['Press'] * 0.85),
-                                  round_weight(self.TMs['Press'] * 0.95))
-        week += "D1. Press 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Press'] * 0.75)
-        week += "D2. Strict Pullup or DB Row or BB row 5 x 10\n"
-        week += "E. Ab exercises 3-5 x 10-20\n"
-        week += "F. Conditioning\n\n"
-
-        week += line()
-        week += "Day 2:\n"
-        week += "A. Deadlift 5, 3, 1+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Deadlift'] * 0.75),
-                                  round_weight(self.TMs['Deadlift'] * 0.85),
-                                  round_weight(self.TMs['Deadlift'] * 0.95))
-        week += "B. Deadlift 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Deadlift'] * 0.75)
-        week += "C. Bench Press 3, 3, 3+ "\
-                "@ %s, %s, %s\n" % (round_weight(self.TMs['Bench Press'] *
-                                                 0.75),
-                                  round_weight(self.TMs['Bench Press'] * 0.85),
-                                  round_weight(self.TMs['Bench Press'] * 0.95))
-        week += "D1. Bench Press 3-5 sets of 5-8 reps @ %s\n" % \
-                round_weight(self.TMs['Bench Press'] * 0.75)
-        week += "D2. Strict Pullup or DB Row or BB row 5 x 10\n"
-        week += "E1. Reverse Hyper, or GH Raise or Back Extension 3-5 x\n"
-        week += "E2. DB Kurlz or OH Triceps Extensions: 3-5 x 10\n"
-        week += "F. Conditioning\n\n"
-
-        self.plan += week
 
     def print_training_cycle(self):
         '''Print a nice screen output of training plan.'''
