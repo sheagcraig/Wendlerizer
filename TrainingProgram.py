@@ -32,6 +32,7 @@ class TrainingProgram(object):
         self.generate_TMs()
 
         self.plan = "Training Plan for %s\n\n" % self.name
+        self.training_notes = []
 
     def read_PRs(self):
         '''Enter the necessary information for generating a training plan.'''
@@ -296,21 +297,25 @@ class TrainingProgram(object):
 
     def print_training_cycle(self):
         '''Print a nice screen output of training plan.'''
-        print(self.plan + self.training_notes() + '\n' + unicorn())
+        print(self.plan)
+        for notes in self.training_notes:
+            print('\n\n%s' % notes)
 
     def write_training_plan(self):
         '''Output a text file with training plan.'''
         with open('%s.txt' % self.name, 'w') as f:
-            f.write(self.plan + '\n\n' +  self.training_notes() + '\n\n' +
-                    unicorn())
+            output = self.plan
+            for notes in self.training_notes:
+                output += '\n\n%s' % notes
+            f.write(output)
 
-    def training_notes(self):
+    def add_training_notes(self, notefile):
         '''Return the training notes.'''
         read_data = ''
-        with open('notes.txt', 'r') as f:
+        with open(notefile, 'r') as f:
             read_data = f.read()
 
-        return read_data
+        self.training_notes.append(read_data)
 
 
 def generate_last_set_first_weight(tm, week, extra_args):
@@ -374,15 +379,6 @@ def round_weight(weight, precision=5.0):
 
     '''
     return int(weight + precision / 2 - ((weight + precision / 2) % precision))
-
-
-def unicorn():
-    '''Return a nice unicorn.'''
-    read_data = ''
-    with open('unicorn.txt', 'r') as f:
-        read_data = f.read()
-
-    return read_data
 
 
 def line():
