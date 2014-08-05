@@ -8,4 +8,4 @@ to help spread the love, I wrote this quick and kind of crappy class to help me 
 members of the barbell club, mostly just because it's a lot cooler than using a spreadsheet (see unicorn.txt).
 
 TrainingProgram.py is the actual class.
-Wendlerizer.py is an example of putting it to use.
+ExampleProgram.py is an example of putting it to use.
