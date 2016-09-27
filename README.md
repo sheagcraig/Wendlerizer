@@ -1,6 +1,7 @@
 # The Wendlerizer
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+
 I love Jim Wendler's 5/3/1 program, and my appreciation has grown the longer I
 do it and use it to coach athletes. In an attempt to help spread the love, I
 wrote this quick and kind of crappy class to help me crank out the numbers for
