@@ -1,0 +1,148 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script>
+            $(function() {
+                $("#button").click(function(){
+                    var weight = parseInt($('#weight').val());
+                    var reps   = parseInt($('#reps').val());
+                    //var max = weight * (1 + (reps/30));
+                    var max = weight * reps * 0.033 + weight;
+                    $('#result').html("Estimated max: " + Math.round(max));
+                });
+            });
+        </script>
+        <style type="text/css">
+            body {
+                font-family: 'Helvetica', sans-serif;
+                background-color: #FFFFFF;
+            }
+            .content {
+                font-size: 10pt;
+          }
+            .formbox{
+                display: inline-block;
+                position: relative;
+                background-color: #EEFFEE;
+                width: 400px;
+                margin: 10px;
+                padding: 20px;
+          }
+          .formbox label {
+            display: inline-block;
+            width: 100px;
+            text-align: right;
+          }
+          .formbox input {
+            display: inline-block;
+            width: 100px;
+          }
+            .textbox{
+                width: 400px;
+                margin: 10px;
+                padding: 20px;
+                font-size: 10pt;
+            }
+          #result {
+            width: 200px;
+            text-align: right;
+          }
+          p {font-size: 10pt;}
+        </style>
+  </head>
+    <body>
+        <div class='container'>
+            <div class='content'>
+                <div class='textbox'>
+                    <p><h1>The Wendlerizer</h1></p>
+                    <p>The Standard program is for most people. It moves the lower body lifts up by 10 and the upper body up by 5 every 3 weeks.</p>
+                    <p>The "Smaller jumps" program will make more modest jumps after every 531 week. Recommended for those who are finding it difficult to keep up with the upper body lifts.</p>
+                </div>
+                <div class='formbox'>
+                    <p><h2>The Wendlerizer: Standard</h2></p>
+                    <p>Please enter your information below to generate a training program for the 2016 CrossFit Local CFT Challenge.</p>
+                    <p>If you don't have a 1RM for a lift, please estimate it below. </p>
+                    {% import "bootstrap/wtf.html" as wtf %}
+                    {{ wtf.quick_form(form) }}
+                    <!--
+                    <form action="CFTChallenge.py/standard" method="POST">
+                        <table>
+                            <tr><td>Please use whole numbers only.</td></tr>
+                            <tr>
+                                <td>Name:</td><td><input type="text" name="name"></td>
+                            </tr>
+                            <tr>
+                                <td>Squat 1RM:</td><td><input type="text" name="squat"></td>
+                            </tr>
+                            <tr>
+                                <td>Press 1RM:</td><td><input type="text" name="press"></td>
+                            </tr>
+                            <tr>
+                                <td>Deadlift 1RM:</td><td><input type="text" name="deadlift"></td>
+                            </tr>
+                            <tr>
+                                <td>Bench Press 1RM:</td><td><input type="text" name="benchpress"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="submit"><td>
+                            </tr>
+                        </table>
+                    </form> -->
+                </div>
+                <div class='formbox'>
+                    <p><h2>The Wendlerizer: Smaller Jumps</h2></p>
+                    <p>Please enter your information below to generate a training program for the 2016 CrossFit Local CFT Challenge.</p>
+                    <p>If you don't have a 1RM for a lift, please estimate it below. </p>
+                    {% import "bootstrap/wtf.html" as wtf %}
+                    {{ wtf.quick_form(form2) }}
+                    <!--<form action="CFTChallenge.py/small_jumps" method="POST">
+                        <table>
+                            <tr><td>Please use whole numbers only.</td></tr>
+                            <tr>
+                                <td>Name:</td><td><input type="text" name="name2"></td>
+                            </tr>
+                            <tr>
+                                <td>Squat 1RM:</td><td><input type="text" name="squat2"></td>
+                            </tr>
+                            <tr>
+                                <td>Press 1RM:</td><td><input type="text" name="press2"></td>
+                            </tr>
+                            <tr>
+                                <td>Deadlift 1RM:</td><td><input type="text" name="deadlift2"></td>
+                            </tr>
+                            <tr>
+                                <td>Bench Press 1RM:</td><td><input type="text" name="benchpress2"></td>
+                            </tr>
+                            <tr>
+                                <td><input type="submit"><td>
+                            </tr>
+                        </table>
+                    </form>-->
+                </div>
+            </div>
+            <div class='formbox'>
+                  <h2>One Rep Max Calculator</h2>
+                  <p>A reasonably useful way to calculate a one rep max is to use a multi-rep max lift plugged into the formula:</p>
+                  <p>1RM = (weight_lifted * num_of_reps * 0.033) + weight_lifted.</p>
+                  <div>
+                      <label>Weight</label>
+                      <input type="text" id="weight">
+                  </div>
+                  <div>
+                      <label>Reps</label>
+                      <input type="text" id="reps">
+                  </div>
+                  <div>
+                      <button id="button">Calculate 1RM</button>
+                  </div>
+                  <div id="result"></div>
+            </div>
+            <p><img src='http://pixel.nymag.com/imgs/daily/grub/2013/10/16/16-chainsaw.w1200.h630.jpg'; width=800px></p>
+                <div class='textbox'>
+                    <p>This code is old and in dire need of refactoring.</p>
+                    <p>Here's the project on GitHub: <a href='https://github.com/sheagcraig/Wendlerizer'><img src='https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png'; width=30px>Wendlerizer</a></p>
+                </div>
+        </div>
+    </body>
+</html>
+

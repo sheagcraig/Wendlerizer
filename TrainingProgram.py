@@ -27,8 +27,9 @@ class TrainingProgram(object):
     '''Represents a complete lifting program, with methods for outputting
     it nicely.
     '''
-    def __init__(self, **kwargs):
+    def __init__(self, light=False, **kwargs):
         '''Generate our plan.'''
+        self.light = light
         if len(kwargs) == 5:
             self.PRs = {'Squat': kwargs['Squat'],
                         'Press': kwargs['Press'],
@@ -73,32 +74,58 @@ class TrainingProgram(object):
 
     def increment_TMs(self):
         '''Add 5#'s to upper body lifts, and 10#'s to lower body lifts'''
-        self.TMs['Squat'] += 10
-        self.TMs['Deadlift'] += 10
-        self.TMs['Press'] += 5
-        self.TMs['Bench Press'] += 5
+        if self.light == True:
+            self.TMs['Squat'] += 5
+            self.TMs['Deadlift'] += 5
+            self.TMs['Press'] += 2.5
+            self.TMs['Bench Press'] += 2.5
+        else:
+            self.TMs['Squat'] += 10
+            self.TMs['Deadlift'] += 10
+            self.TMs['Press'] += 5
+            self.TMs['Bench Press'] += 5
 
     def generate_531_weights(self, tm, week):
         '''Given a training max, and a week of the cycle, return a string of
         weights to lift for reps. Week=1=5, 5, 5+; 2=3, 3, 3+; 3=5, 3, 1+.
         '''
-        if week == 1:
-            weights = "5, 5, 5+ @ %i, %i, %i" % (round_weight(tm * 0.65),
-                                               round_weight(tm * 0.75),
-                                               round_weight(tm * 0.85))
-        elif week == 2:
-            weights = "3, 3, 3+ @ %i, %i, %i" % (round_weight(tm * 0.7),
-                                               round_weight(tm * 0.8),
-                                               round_weight(tm * 0.9))
-        elif week == 3:
-            weights = "5, 3, 1+ @ %i, %i, %i" % (round_weight(tm * 0.75),
-                                               round_weight(tm * 0.85),
-                                               round_weight(tm * 0.95))
+        if not self.light:
+            if week == 1:
+                weights = "5, 5, 5+ @ %i, %i, %i" % (round_weight(tm * 0.65),
+                                                round_weight(tm * 0.75),
+                                                round_weight(tm * 0.85))
+            elif week == 2:
+                weights = "3, 3, 3+ @ %i, %i, %i" % (round_weight(tm * 0.7),
+                                                round_weight(tm * 0.8),
+                                                round_weight(tm * 0.9))
+            elif week == 3:
+                weights = "5, 3, 1+ @ %i, %i, %i" % (round_weight(tm * 0.75),
+                                                round_weight(tm * 0.85),
+                                                round_weight(tm * 0.95))
+            else:
+                # Rest week
+                weights = "5, 5, 5 @ %i, %i, %i" % (round_weight(tm * 0.4),
+                                                round_weight(tm * 0.5),
+                                                round_weight(tm * 0.6))
         else:
-            # Rest week
-            weights = "5, 5, 5 @ %i, %i, %i" % (round_weight(tm * 0.4),
-                                              round_weight(tm * 0.5),
-                                              round_weight(tm * 0.6))
+            if week == 1:
+                weights = "5, 5, 5+ @ %i, %i, %i" % (round_weight(tm * 0.65, precision=2.5),
+                                                round_weight(tm * 0.75, precision=2.5),
+                                                round_weight(tm * 0.85, precision=2.5))
+            elif week == 2:
+                weights = "3, 3, 3+ @ %i, %i, %i" % (round_weight(tm * 0.7, precision=2.5),
+                                                round_weight(tm * 0.8, precision=2.5),
+                                                round_weight(tm * 0.9, precision=2.5))
+            elif week == 3:
+                weights = "5, 3, 1+ @ %i, %i, %i" % (round_weight(tm * 0.75, precision=2.5),
+                                                round_weight(tm * 0.85, precision=2.5),
+                                                round_weight(tm * 0.95, precision=2.5))
+            else:
+                # Rest week
+                weights = "5, 5, 5 @ %i, %i, %i" % (round_weight(tm * 0.4, precision=2.5),
+                                                round_weight(tm * 0.5, precision=2.5),
+                                                round_weight(tm * 0.6, precision=2.5))
+
         return weights
 
     def generate_training_cycle(self, week_pattern, assistance_funcs):
@@ -146,9 +173,8 @@ class TrainingProgram(object):
             for lift, tm in self.TMs.items():
                 element = 'A'
                 self.plan += "%s Workout\n" % lift
-                self.plan += "A. %s %s\n" % (lift,
-                                             self.generate_531_weights(tm,
-                                                                       week))
+                self.plan += "A. %s %s\n" % (
+                    lift, self.generate_531_weights(tm, week))
                 if not week == 4:
                     for superset in assistance_funcs:
                         element = chr(ord(element) + 1)
@@ -193,6 +219,14 @@ class TrainingProgram(object):
             for notes in self.training_notes:
                 output += '\n\n%s' % notes
             f.write(output)
+
+    def get_training_plan(self):
+        """Return training plan as a string."""
+        plan = self.plan
+        for notes in self.training_notes:
+            plan += '\n\n%s' % notes
+
+        return plan
 
     def add_training_notes(self, notefile):
         '''Return the training notes.'''
