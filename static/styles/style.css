@@ -1,0 +1,18 @@
+body {
+	background-image: url('http://pixel.nymag.com/imgs/daily/grub/2013/10/16/16-chainsaw.w1200.h630.jpg');
+	background-repeat: no-repeat;
+	background-position: bottom;
+	background-size: 100%;
+	background-attachment: fixed;
+}
+
+.box {
+	background-color: #EEFFEE;
+	opacity: 0.9;
+}
+
+.box-offset {margin-left: 20px;}
+
+.row {
+	margin-bottom: 20px;
+}

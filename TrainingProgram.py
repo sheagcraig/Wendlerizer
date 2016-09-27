@@ -51,6 +51,8 @@ class TrainingProgram(object):
         self.generate_TMs()
 
         self.plan = "Training Plan for %s\n\n" % self.name
+        self.plan += "Based on 1RMs:\n"
+        self.plan += ", ".join("{}: {}".format(lift, weight) for lift, weight in self.PRs.items()) + "\n\n"
         self.training_notes = []
 
     def read_PRs(self):
@@ -168,7 +170,11 @@ class TrainingProgram(object):
                 continue
 
             self.plan += "Week %i\n" % ctr
+            # import pdb; pdb.set_trace()
             self.plan += line() + '\n'
+
+            self.plan += "Training Maxes:\n"
+            self.plan += ", ".join("{}: {}".format(lift, weight) for lift, weight in self.TMs.items()) + "\n\n"
 
             for lift, tm in self.TMs.items():
                 element = 'A'
