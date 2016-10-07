@@ -60,7 +60,7 @@ def index():
 
 
 def generate_program(form):
-    """"""
+    """Generate a training cycle based on form data."""
     name = form.name.data
     squat = form.squat.data
     press = form.press.data
