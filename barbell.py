@@ -32,7 +32,8 @@ configuration as part of a higher-order type like Mesocycle.
 
 class Lift(object):
 
-    def __init__(self, lift_type, personal_record, training_max=None):
+    def __init__(self, lift_type, personal_record, training_max=None,
+                 increment=10.0):
         self.lift_type = lift_type
         self.personal_record = personal_record
         if training_max:
@@ -47,8 +48,11 @@ class Lift(object):
             # No training max supplied, so use PR.
             self.training_max = personal_record
 
-    def increase_training_max(self, amount):
-        self.training_max += amount
+        self.increment = increment
+
+    def increase_training_max(self):
+        if self.training_max and self.increment:
+            self.training_max += self.increment
 
 
 class Element(object):
@@ -155,6 +159,7 @@ class Element(object):
 
     def __init__(self, lift):
         self.lift = lift
+        # TODO: Keep or no?
         # if (not isinstance(self.load_coefficients, list) or
         #         any(item is None or len(item) == 0 for item in
         #             self.load_coefficients) or
@@ -227,7 +232,7 @@ class Element(object):
                 if isinstance(set_load, float):
                     result.append(
                         (round_weight(set_load * self.lift.training_max),
-                        set_reps))
+                         set_reps))
                 else:
                     result.append((set_load, set_reps))
 
@@ -277,8 +282,10 @@ class Session(object):
         result = []
         for element in self.element_generators:
             if isinstance(element, list):
+                sub_result = []
                 for sub_element in element:
-                    result.append(sub_element.next())
+                    sub_result.append(sub_element.next())
+                result.append(sub_result)
             else:
                 result.append(element.next())
         return result
@@ -310,90 +317,36 @@ class Mesocycle(object):
                 sessions.append(session.next())
             cycle.append(sessions)
 
-            # # Handle bumping up training max if it is configured.
-            # # TODO: Better arg handling
-            # if self.training_max_modulation:
-            #     # If this Element uses training max increases, check to
-            #     # see if one is due.
-            #     freq, mod_amt = self.training_max_modulation[self.mod_index]
-
-            #     if self.session_counter == freq - 1:
-            #         # TODO: Bump up primary lift
-            #         # for lift in [session.elements[0].lift for session in self.sessions]:
-            #         #     lift.increase_training_max(mod_amt)
-            #         # TODO: Doesn't handle variable increases (get from lift)
-            #         for lift in self.lifts:
-            #             lift.training_max += mod_amt
-            #         self.session_counter = 0
-
-            #         # If we have consumed the modulation list, reset the
-            #         # index to begin at the start again.
-            #         self.mod_index += 1
-            #         if self.mod_index == len(self.training_max_modulation):
-            #             self.mod_index = 0
-            #     else:
-            #         self.session_counter += 1
-
         return cycle
 
-    def old_cycle(self):
-        result = []
-        for session in self._sessions:
-            result.append(session.session().next())
+    def increase_training_maxes(self):
+        for lift in self.lifts:
+            lift.increase_training_max()
 
-            # Handle bumping up training max if it is configured.
-            # TODO: Better arg handling
-            if self.training_max_modulation:
-                # If this Element uses training max increases, check to
-                # see if one is due.
-                freq, mod_amt = self.training_max_modulation[self.mod_index]
+        # # Handle bumping up training max if it is configured.
+        # # TODO: Better arg handling
+        # if self.training_max_modulation:
+        #     # If this Element uses training max increases, check to
+        #     # see if one is due.
+        #     freq, mod_amt = self.training_max_modulation[self.mod_index]
 
-                if self.session_counter == freq - 1:
-                    # TODO: Bump up primary lift
-                    # for lift in [session.elements[0].lift for session in self.sessions]:
-                    #     lift.increase_training_max(mod_amt)
-                    # TODO: Doesn't handle variable increases (get from lift)
-                    for lift in self.lifts:
-                        lift.training_max += mod_amt
-                    self.session_counter = 0
+        #     if self.session_counter == freq - 1:
+        #         # TODO: Bump up primary lift
+        #         # for lift in [session.elements[0].lift for session in self.sessions]:
+        #         #     lift.increase_training_max(mod_amt)
+        #         # TODO: Doesn't handle variable increases (get from lift)
+        #         for lift in self.lifts:
+        #             lift.training_max += mod_amt
+        #         self.session_counter = 0
 
-                    # If we have consumed the modulation list, reset the
-                    # index to begin at the start again.
-                    self.mod_index += 1
-                    if self.mod_index == len(self.training_max_modulation):
-                        self.mod_index = 0
-                else:
-                    self.session_counter += 1
+        #         # If we have consumed the modulation list, reset the
+        #         # index to begin at the start again.
+        #         self.mod_index += 1
+        #         if self.mod_index == len(self.training_max_modulation):
+        #             self.mod_index = 0
+        #     else:
+        #         self.session_counter += 1
 
-        return result
-
-
-def round_weight(weight, precision=5.0):
-    """Round a weight to the nearest (doubled) plate size.
-
-    Given a weight, round to the nearest available
-    combination of plates. For example, if the smallest plates
-    available are 2.5# plates, the precision is thus 5 (2.5 * 2).
-
-    If you just want to avoid micro-loading, set the precision to the
-    smallest increment you want to use.
-
-    Note: This function has no concept of units. Switching between
-    pounds and kilos for the purposes of this function is about
-    specifying the precision.
-
-    e.g. round_weight(103.5) = 105
-         round_weight(103.5, 2.0) = 104
-         round_weight(101.5) = 100
-
-    Args:
-        weight (number): The weight to round to the nearest plate combo.
-        precision (number): The smallest increment available for plate
-            changes. Default is "5.0", based on standard 2.5# sets.
-            People from the modern world will probably want 1.0 for 0.5kg
-            fractionals.
-    """
-    return int(weight + precision / 2 - ((weight + precision / 2) % precision))
 
 
 # Subclasses
@@ -434,6 +387,11 @@ class JokerSomething(Element):
     training_max_modulation = [(3, 10), (3, 10), (1, 0)]
 
 
+class FirstSetLastSomething(Element):
+    load_coefficients = [(0.65,), (0.70,), (0.75,)]
+    scheme = [("3-5 sets of 5-8 reps",)]
+
+
 class AccessoryLift(Element):
     load_coefficients = [(None,)]
     scheme = [("5 sets of 10",)]
@@ -444,62 +402,32 @@ class CoreWork(Element):
     scheme = [("5 sets of 10-20",)]
 
 
-class FirstSetLastSomething(Element):
-    load_coefficients = [(0.65,), (0.70,), (0.75,)]
-    scheme = [("3-5 sets of 5-8 reps",)]
+# Helper funcs
+def round_weight(weight, precision=5.0):
+    """Round a weight to the nearest (doubled) plate size.
 
+    Given a weight, round to the nearest available
+    combination of plates. For example, if the smallest plates
+    available are 2.5# plates, the precision is thus 5 (2.5 * 2).
 
-class Squat531Session(Session):
-    """Squat session generator for 531."""
-    elements = ([WendlerSomething, "squat"],
-                [JokerSomething, "squat"],
-                [FirstSetLastSomething, "squat"])
+    If you just want to avoid micro-loading, set the precision to the
+    smallest increment you want to use.
 
+    Note: This function has no concept of units. Switching between
+    pounds and kilos for the purposes of this function is about
+    specifying the precision.
 
-class Deadlift531Session(Session):
-    """Deadlift session generator for 531."""
-    elements = ([WendlerSomething, "deadlift"],
-                [JokerSomething, "deadlift"],
-                [FirstSetLastSomething, "deadlift"])
+    e.g. round_weight(103.5) = 105
+         round_weight(103.5, 2.0) = 104
+         round_weight(101.5) = 100
 
-
-class Press531Session(Session):
-    """Press session generator for 531."""
-    elements = (
-        [WendlerSomething, "press"],
-        [JokerSomething, "press"],
-        [[FirstSetLastSomething, "press"], [AccessoryLift, "Pull up"]],
-        [AccessoryLift, "Barbell Curls"])
-
-
-class BenchPress531Session(Session):
-    """Bench press session generator for 531."""
-    elements = (
-        [WendlerSomething, "bench press"],
-        [JokerSomething, "bench press"],
-        [[FirstSetLastSomething, "bench press"], [AccessoryLift, "DB Row"]],
-        [AccessoryLift, "Barbell OH Tricep Extension"])
-
-
-# TODO: I'm not sure this really helps, as it then requires some kind
-# of mechanism in the Cycle classes to dynamically create Sessions,
-# which seems like a violation of SRP.
-class WendlerSession(Session):
-    elements = ([WendlerSomething, None],
-                [JokerSomething, None],
-                [FirstSetLastSomething, None])
-
-    def __init__(self, lifts, primary_lift):
-        for element in self.elements:
-            if not element[1]:
-                element[1] = primary_lift.lift_type
-
-        super(WendlerSession, self).__init__(lifts)
-
-
-class WendlerCycle(Mesocycle):
-    training_max_modulation = [(3, 10)]
-    sessions = [Squat531Session, Press531Session, Deadlift531Session,
-                BenchPress531Session]
+    Args:
+        weight (number): The weight to round to the nearest plate combo.
+        precision (number): The smallest increment available for plate
+            changes. Default is "5.0", based on standard 2.5# sets.
+            People from the modern world will probably want 1.0 for 0.5kg
+            fractionals.
+    """
+    return int(weight + precision / 2 - ((weight + precision / 2) % precision))
 
 
