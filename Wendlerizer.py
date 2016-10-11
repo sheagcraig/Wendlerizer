@@ -25,6 +25,8 @@ from flask_wtf import Form
 from wtforms import BooleanField, IntegerField, StringField, SubmitField
 from wtforms.validators import Required, NoneOf
 
+from barbell import (Lift, WendlerSomething, JokerSomething,
+                     FirstSetLastSomething, AccessoryLift, Session, Mesocycle)
 import TrainingProgram as TP
 
 
@@ -49,12 +51,51 @@ class LiftForm(Form):
     submit = SubmitField("Get Wendlerized")
 
 
+class Squat531Session(Session):
+    """Squat session generator for 531."""
+    elements = ([WendlerSomething, "Squat"],
+                [JokerSomething, "Squat"],
+                [FirstSetLastSomething, "Squat"])
+
+
+class Deadlift531Session(Session):
+    """Deadlift session generator for 531."""
+    elements = ([WendlerSomething, "Deadlift"],
+                [JokerSomething, "Deadlift"],
+                [FirstSetLastSomething, "Deadlift"])
+
+
+class Press531Session(Session):
+    """Press session generator for 531."""
+    elements = (
+        [WendlerSomething, "Press"],
+        [JokerSomething, "Press"],
+        [[FirstSetLastSomething, "Press"], [AccessoryLift, "Pull Up"]],
+        [AccessoryLift, "Barbell Curl"])
+
+
+class BenchPress531Session(Session):
+    """Bench press session generator for 531."""
+    elements = (
+        [WendlerSomething, "Bench Press"],
+        [JokerSomething, "Bench Press"],
+        [[FirstSetLastSomething, "Bench Press"], [AccessoryLift, "DB Row"]],
+        [AccessoryLift, "Barbell OH Tricep Extension"])
+
+
+class WendlerCycle(Mesocycle):
+    sessions = [Squat531Session, Press531Session, Deadlift531Session,
+                BenchPress531Session]
+
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     """Extract lift info from user."""
     form = LiftForm()
     if form.validate_on_submit() and form.submit.data:
-        return "<pre>{}</pre>".format(generate_program(form))
+        #return "<pre>{}</pre>".format(generate_program(form))
+        cycle = generate_program(form)
+        return render_template("Program.html", cycle=cycle)
 
     return render_template("Wendlerizer.html", form=form)
 
@@ -62,41 +103,36 @@ def index():
 def generate_program(form):
     """Generate a training cycle based on form data."""
     name = form.name.data
-    squat = form.squat.data
-    press = form.press.data
-    deadlift = form.deadlift.data
-    benchpress = form.bench_press.data
+    initial_scale = 0.9
+    small_increment = 5.0
+    squat = Lift("Squat", form.squat.data, initial_scale)
+    press = Lift("Press", form.press.data, initial_scale, small_increment)
+    deadlift = Lift("Deadlift", form.deadlift.data, initial_scale)
+    bench_press = Lift("Bench Press", form.bench_press.data,
+                               initial_scale, small_increment)
+
+    pull_up = Lift("Pull Up", None)
+    db_row = Lift("DB Row", None)
+    curl = Lift("Barbell Curl", None)
+    tricep_ext = Lift("Barbell OH Tricep Extension", None)
+    core = Lift("Core", None)
+
     light = form.light.data
 
-    tp = TP.TrainingProgram(Name=name, Squat=int(squat), Press=int(press),
-                            Deadlift=int(deadlift), BenchPress=int(benchpress),
-                            light=light)
+    cycle = WendlerCycle(
+        [squat, press, deadlift, bench_press, pull_up, db_row, curl,
+         tricep_ext, core])
 
-    # These are my minor assistance exercises
-    work = {'Squat': '',
-            'Deadlift': '',
-            'Press': 'Pullup 5 x 10',
-            'Bench Press': 'DB Row 5 x 10'}
+    # TODO: It would be nice to have something to send to the template about
+    # what the current TM's are per week.
 
-    # These are my abz and stuff
-    extra_work = {'Squat': 'Abs 5 x 10-20',
-                  'Deadlift': 'Abs 5 x 10-20',
-                  'Press': 'Kurlz 5 x 10',
-                  'Bench Press': 'Tricepz 5 x 10'}
+    cycle1 = cycle.generate_cycle()
+    cycle.increase_training_maxes()
+    cycle2 = cycle.generate_cycle()
 
-    # Specify assistance
-    assistance = []
-    assistance.append([[TP.generate_last_set_first_weight, {}],
-                       [TP.generate_assistance_assistance, work]])
-    assistance.append([[TP.generate_assistance_assistance, extra_work]])
-
-    tp.generate_training_cycle((1, 2, 3, 'X', 1, 2, 3, 'X', 1, 2), assistance)
-    tp.add_training_notes(os.path.join(PROJECT_DIR, 'notes.txt'))
-    tp.add_training_notes(os.path.join(PROJECT_DIR, 'unicorn.txt'))
-    return tp.get_training_plan()
+    return cycle1 + cycle2
 
 
 if __name__ == "__main__":
     app.secret_key = "TacosareTheMOSTdelicicousestOfthingsThis is forCSRFy'all"
     app.run(debug=True, port=PORT, extra_files=["templates", "static/styles"])
-

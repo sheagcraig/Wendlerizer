@@ -16,3 +16,8 @@ body {
 .row {
 	margin-bottom: 20px;
 }
+
+.session {
+	background-color: #EEE;
+	padding: 10px;
+}
