@@ -33,7 +33,7 @@ configuration as part of a higher-order type like Mesocycle.
 class Lift(object):
 
     def __init__(self, lift_type, personal_record, training_max=None,
-                 increment=10.0):
+                 increment=10.0, barbell_weight=45.0):
         self.lift_type = lift_type
         self.personal_record = personal_record
         if training_max:
@@ -49,6 +49,7 @@ class Lift(object):
             self.training_max = personal_record
 
         self.increment = increment
+        self.barbell_weight = barbell_weight
 
     def increase_training_max(self):
         if self.training_max and self.increment:
@@ -185,7 +186,8 @@ class Element(object):
         load_queue = []
         for load in loads:
             if isinstance(load, float):
-                load = round_weight(load * self.lift.training_max)
+                load = round_weight(load * self.lift.training_max,
+                                    barbell_weight=self.lift.barbell_weight)
             load_queue.append(load)
         self.load_coefficient_index += 1
 
@@ -403,7 +405,7 @@ class CoreWork(Element):
 
 
 # Helper funcs
-def round_weight(weight, precision=5.0):
+def round_weight(weight, precision=5.0, barbell_weight=45.0):
     """Round a weight to the nearest (doubled) plate size.
 
     Given a weight, round to the nearest available
@@ -420,6 +422,7 @@ def round_weight(weight, precision=5.0):
     e.g. round_weight(103.5) = 105
          round_weight(103.5, 2.0) = 104
          round_weight(101.5) = 100
+         round_weight(101, precision=5.0, barbell_weight=33) = 103
 
     Args:
         weight (number): The weight to round to the nearest plate combo.
@@ -427,7 +430,24 @@ def round_weight(weight, precision=5.0):
             changes. Default is "5.0", based on standard 2.5# sets.
             People from the modern world will probably want 1.0 for 0.5kg
             fractionals.
+        barbell_weight (number): The weight of the barbell in the same
+            units as the rounded weight. It defaults to the fantasy
+            value of 45 which everyone uses even though standard bars are
+            actually 20kg.
+
+    Returns:
+        int rounded weight value to the nearest plate combination
+        loadable for that bar. If the weight is less than the bar, the
+        weight of the bar is returned.
     """
-    return int(weight + precision / 2 - ((weight + precision / 2) % precision))
+    plate_weight = weight - barbell_weight
+    if plate_weight < 0:
+        rounded_weight = barbell_weight
+    else:
+        rounded_weight = (
+            plate_weight + precision / 2 -
+            ((plate_weight + precision / 2) % precision) +
+            barbell_weight)
+    return int(rounded_weight)
 
 
