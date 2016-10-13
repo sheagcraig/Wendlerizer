@@ -26,7 +26,7 @@ consisting of any number of Sessions, and Macrocycles built upon
 Microcycles. Each class has a variety of overrideable public attributes
 for contolling progression and variation over the course of the training
 plan. Further, each type can be used on its own, or only during
-configuration as part of a higher-order type like Mesocycle.
+configuration as part of a higher-order type like Microcycle.
 """
 
 
@@ -294,8 +294,8 @@ class Session(object):
         return (self.name, result)
 
 
-class Mesocycle(object):
-    '''Represents a series of microcycles of lifting.
+class Microcycle(object):
+    '''Represents a series sessions as a microcycle of lifting.
 
     Includes methods for managing training load increases and deviations
     from the patterns configured in Elements.
@@ -320,7 +320,28 @@ class Mesocycle(object):
                 sessions.append(session.next())
             cycle.append(sessions)
 
-        return cycle
+        result = self.get_metadata()
+        result["cycle"] = cycle
+
+        return result
+
+    def get_metadata(self):
+        """Return a dict of information from this cycle"""
+        result = {}
+        meta_types = ("name", "training_maxes", "personal_records", "notes")
+        for meta in meta_types:
+            if hasattr(self, meta):
+                result[meta] = getattr(self, meta)
+
+        return result
+
+    @property
+    def training_maxes(self):
+        return {lift.lift_type: lift.training_max for lift in self.lifts}
+
+    @property
+    def personal_records(self):
+        return {lift.lift_type: lift.personal_record for lift in self.lifts}
 
     def increase_training_maxes(self):
         for lift in self.lifts:
@@ -365,23 +386,10 @@ class WendlerSomething(Element):
     training_max_modulation = [(3, 10), (3, 10), (1, 0)]
 
 
-# TODO: This is mostly just here for testing that uneven lengths
-# of schemes can happily coexist with loads.
-class WendlerSomething2(Element):
-    load_coefficients = [
-        (0.65, 0.75, 0.85), (0.7, 0.8, 0.9), (0.75, 0.85, 0.95)]
-    scheme = [
-        (5,), (3, 3, "3+")]
-    # TODO: Maybe move the modulation to after the deload week?
-    # After 3 session increase by 10, 3 more, increase by 10, then the
-    # deload week do nothing.
-    training_max_modulation = [(3, 10), (3, 10), (1, 0)]
-
-
 class JokerSomething(Element):
     load_coefficients = [
-        ("+5% Joker", "+5% Joker"), ("+5% Joker", "+5% Joker"),
-        ("+5% Joker",)]
+        ("+5-10% Joker", "+5-10% Joker"), ("+5-10% Joker", "+5-10% Joker"),
+        ("+5-10% Joker",)]
     scheme = [
         (5, 1), (3, 1), (1,)]
     # TODO: Maybe move the modulation to after the deload week?
@@ -406,6 +414,7 @@ class CoreWork(Element):
 
 
 # Helper funcs
+
 def round_weight(weight, precision=5.0, barbell_weight=45.0):
     """Round a weight to the nearest (doubled) plate size.
 

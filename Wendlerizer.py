@@ -27,7 +27,7 @@ from wtforms import (BooleanField, IntegerField, RadioField, StringField,
 from wtforms.validators import Required, NoneOf
 
 from barbell import (Lift, WendlerSomething, JokerSomething,
-                     FirstSetLastSomething, AccessoryLift, Session, Mesocycle)
+                     FirstSetLastSomething, AccessoryLift, Session, Microcycle)
 import TrainingProgram as TP
 
 
@@ -91,7 +91,9 @@ class BenchPress531Session(Session):
         [AccessoryLift, "Barbell OH Tricep Extension"])
 
 
-class WendlerCycle(Mesocycle):
+class WendlerCycle(Microcycle):
+    name = "Wendler 531 Cycle"
+    notes = "Three week Wendler microcycle."
     sessions = [Squat531Session, Press531Session, Deadlift531Session,
                 BenchPress531Session]
 
@@ -102,14 +104,14 @@ def index():
     form = LiftForm()
     if form.validate_on_submit() and form.submit.data:
         cycle = generate_program(form)
-        with open("notes.txt") as ifile:
+        with open("notes.html") as ifile:
             notes = ifile.read()
         meta = {"Generated from PRs": "Squat {}, Press {}, Deadlift {}, "
                 "Bench press {}".format(form.squat.data, form.press.data,
                 form.deadlift.data, form.bench_press.data)}
         meta["Light Program Jumps"] = str(form.light.data)
         meta["Barbell Used"] = form.bar_type.data
-        return render_template("Program.html", cycle=cycle, notes=notes,
+        return render_template("Program.html", cycles=cycle, notes=notes,
                                name=form.name.data, meta=meta)
     else:
         print form.errors
@@ -161,7 +163,7 @@ def generate_program(form):
     cycle.increase_training_maxes()
     cycle2 = cycle.generate_cycle()
 
-    return cycle1 + cycle2
+    return [cycle1, cycle2]
 
 
 if __name__ == "__main__":

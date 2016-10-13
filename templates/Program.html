@@ -1,75 +1,86 @@
 {% extends "bootstrap/base.html" %}
 {% block title %}The Wendlerizer{% endblock %}
 {% block styles %}
-	{{ super() }}
-	<link rel="stylesheet" href="{{ url_for('.static', filename='styles/style.css') }}">
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('.static', filename='styles/style.css') }}">
 {% endblock %}
 {% block content %}
-	<div class="container program">
-		<div class='page-header'>
-			<h1>The Wendlerizer <small>CrossFit Local Total Challenge 2016</small></h1>
-		</div>
-		<div>
-			<div class='row'>
-				<div class='col-md-6 session'>
-					<h3>Program for {{ name }}</h3>
-					<ul>
+<div class="container program">
+	<div class='page-header'>
+		<h1>The Wendlerizer <small>CrossFit Local Total Challenge 2016</small></h1>
+	</div>
+	<div>
+		<div class='row'>
+			<div class='col-md-6 session'>
+				<h3>Program for {{ name }}</h3>
+				<dl>
 					{% for key in meta %}
-						<li>{{ key }}: {{ meta[key] }}</li>
+					<dt>{{ key }}</dt>
+					<dd>{{ meta[key] }}</dd>
 					{% endfor %}
-					</ul>
-				</div>
+				</ul>
 			</div>
-			{% set headings = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
-			{% for week in cycle %}
-				<h4>Week {{ loop.index }}</h4>
-					<div class='row'>
-					{% for session in week %}
-						<div class='col-md-6 session'>
-							<h4>{{ session[0] }} Session</h4>
-							{% for element in session[1] %}
-								<p>
-								{% if element[0] is string %}
-									{{ headings[loop.index - 1] }}. 
-									{% set comma = joiner() %}
-									{{ element[0] }}
-									{% for set in element[1] -%}
-										{{ comma() }}
-										{% if set[0] %}
-										{{ set[0] }} x
-										{% endif %}
-										{{ set[1] -}}
-									{% endfor %}
-								</p>
-								{% else %}
-								  <p>
-									{% set sub_element_header = headings[loop.index - 1] %}
-									{% for sub_element in element %}
-										{% set comma = joiner() %}
-										{{ sub_element_header }}{{ loop.index }}. 
-										{{ sub_element[0] }}
-										{% for set in sub_element[1] -%}
-											{{ comma() }}
-											{% if set[0] %}
-											{{ set[0] }} x
-											{% endif %}
-											{{ set[1] -}}
-										{% endfor %}
-									</p>
-									{% endfor %}
-									</ol>
-								{% endif %}
-							{% endfor %}
-						</div>
+		</div>
+		{% for cycle in cycles %}
+		<h3>{{ cycle["name"] }}<small>{{ cycle["notes"] }}</small></h3>
+		<h4>Training Maxes: <small>
+			{% for lift_type, training_max in cycle["training_maxes"].items() %}
+			{% if training_max %}
+			{{ lift_type }}: <em>{{ training_max|int }}</em>
+			{% endif %}
+			{% endfor %}
+		</small></h4>
+		{% set headings = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
+		{% for week in cycle["cycle"] %}
+		<h3>Week {{ loop.index }}</h3>
+		<div class='row'>
+			{% for session in week %}
+			<div class='col-md-6 session'>
+				<h4>{{ session[0] }} Session</h4>
+				{% for element in session[1] %}
+				<p>
+					{% if element[0] is string %}
+					<strong>{{ headings[loop.index - 1] }}.</strong>
+					{% set comma = joiner() %}
+					{{ element[0] }}
+					{% for set in element[1] -%}
+					{{ comma() }}
+					{% if set[0] %}
+					{{ set[0] }} x
+					{% endif %}
+					{{ set[1] -}}
+					{% endfor %}
+				</p>
+				{% else %}
+				<p>
+					{% set sub_element_header = headings[loop.index - 1] %}
+					{% for sub_element in element %}
+					{% set comma = joiner() %}
+					<strong>{{ sub_element_header }}{{ loop.index }}.</strong>
+					{{ sub_element[0] }}
+					{% for set in sub_element[1] -%}
+					{{ comma() }}
+					{% if set[0] %}
+					{{ set[0] }} x
+					{% endif %}
+					{{ set[1] -}}
+					{% endfor %}
+				</p>
 				{% endfor %}
-			</div>
+			</ol>
+			{% endif %}
 			{% endfor %}
 		</div>
-		<div class='row'>
-			<div class='col-md-12'>
-				<pre>{{ notes }}</pre>
-				<img src="{{ url_for('.static', filename='images/taco.gif') }}">
-			</div>
-		</div>
+		{% endfor %}
 	</div>
+	{% endfor %}
+	{% endfor %}
+</div>
+<div class='row'>
+	<div class='col-md-6'>
+		{{ notes|safe }}
+		<img src="{{ url_for('.static', filename='images/taco.gif') }}">
+	</div>
+</div>
+</div>
 {% endblock %}
