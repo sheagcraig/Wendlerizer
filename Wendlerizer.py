@@ -106,14 +106,12 @@ def index():
     form = LiftForm()
     if form.validate_on_submit() and form.submit.data:
         cycle = generate_program(form)
-        with open("notes.html") as ifile:
-            notes = ifile.read()
         meta = {"Generated from PRs": "Squat {}, Press {}, Deadlift {}, "
                 "Bench press {}".format(form.squat.data, form.press.data,
                 form.deadlift.data, form.bench_press.data)}
         meta["Light Program Jumps"] = str(form.light.data)
         meta["Barbell Used"] = form.bar_type.data
-        return render_template("Program.html", cycles=cycle, notes=notes,
+        return render_template("ProgramWithNotes.html", cycles=cycle,
                                name=form.name.data, meta=meta)
     else:
         print form.errors
