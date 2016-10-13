@@ -104,10 +104,16 @@ def generate_program(form):
     """Generate a training cycle based on form data."""
     name = form.name.data
     initial_scale = 0.9
-    small_increment = 5.0
-    squat = Lift("Squat", form.squat.data, initial_scale)
+
+    # Manage the size of the jumps based on the "Light" form toggle.
+    light = form.light.data
+    large_increment = 5.0 if light else 10.0
+    small_increment = 2.5 if light else 5.0
+
+    squat = Lift("Squat", form.squat.data, initial_scale, large_increment)
     press = Lift("Press", form.press.data, initial_scale, small_increment)
-    deadlift = Lift("Deadlift", form.deadlift.data, initial_scale)
+    deadlift = Lift("Deadlift", form.deadlift.data, initial_scale,
+                    large_increment)
     bench_press = Lift("Bench Press", form.bench_press.data,
                                initial_scale, small_increment)
 
@@ -117,14 +123,15 @@ def generate_program(form):
     tricep_ext = Lift("Barbell OH Tricep Extension", None)
     core = Lift("Core", None)
 
-    light = form.light.data
-
     cycle = WendlerCycle(
         [squat, press, deadlift, bench_press, pull_up, db_row, curl,
          tricep_ext, core])
 
     # TODO: It would be nice to have something to send to the template about
-    # what the current TM's are per week.
+    # what the current TM's are per week, the user's name, the light value, etc.
+
+    # TODO: I also need some way for people to drop-in old values and continue
+    # their existing program if they want to keep going.
 
     cycle1 = cycle.generate_cycle()
     cycle.increase_training_maxes()
