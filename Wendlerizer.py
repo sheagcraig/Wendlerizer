@@ -60,7 +60,8 @@ class Squat531Session(Session):
     name = "Squat"
     elements = ([WendlerSomething, "Squat"],
                 [JokerSomething, "Squat"],
-                [FirstSetLastSomething, "Squat"])
+                [FirstSetLastSomething, "Squat"],
+                [AccessoryLift, "Core"])
 
 
 class Deadlift531Session(Session):
@@ -68,7 +69,8 @@ class Deadlift531Session(Session):
     name = "Deadlift"
     elements = ([WendlerSomething, "Deadlift"],
                 [JokerSomething, "Deadlift"],
-                [FirstSetLastSomething, "Deadlift"])
+                [FirstSetLastSomething, "Deadlift"],
+                [AccessoryLift, "Core"])
 
 
 class Press531Session(Session):

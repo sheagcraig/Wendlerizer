@@ -18,18 +18,20 @@
 					<dt>{{ key }}</dt>
 					<dd>{{ meta[key] }}</dd>
 					{% endfor %}
-				</ul>
+				</dl>
 			</div>
 		</div>
 		{% for cycle in cycles %}
-		<h3>{{ cycle["name"] }}<small>{{ cycle["notes"] }}</small></h3>
-		<h4>Training Maxes: <small>
+		<h3>{{ cycle["name"] }} {{ loop.index }} <small>{{ cycle["notes"] }}</small></h3>
+		<h4>Training Maxes <small>and Joker increments</small></h4>
+		<dl>
 			{% for lift_type, training_max in cycle["training_maxes"].items() %}
 			{% if training_max %}
-			{{ lift_type }}: <em>{{ training_max|int }}</em>
+			<dt>{{ lift_type }}</dt>
+			<dd>{{ training_max|int }} (5%: {{ (training_max * 0.05)|int }}, 10% {{ (training_max * 0.1)|int }})</dd>
 			{% endif %}
 			{% endfor %}
-		</small></h4>
+		</dl>
 		{% set headings = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
 		{% for week in cycle["cycle"] %}
 		<h3>Week {{ loop.index }}</h3>
