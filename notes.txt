@@ -2,13 +2,13 @@ NOTES:
 
 1. What is that + sign for?
 The most important part of this program is the work sets. These are the 531
-lifts, usually the A and C elements of each days workout. 
+lifts, usually the A element of each days workout. 
 
 The plus means do as many reps as possible, with the preceding number
 indicating a minimum number of reps.
 
 For example,when you see:
-'Squat 5, 5, 5+ @ 200, 225, 250'
+'Squat 200 x 5, 225 x 5, 250 x 5+'
 
 this means to perform three sets of squats.
 The first set is 5 reps at 200. 
@@ -80,7 +80,3 @@ you do them, including the number of reps on your max reps sets.
 5. How many sets and reps should I do for...
 Ranges are usually given. Use how you are feeling to determine whether to go
 for more or less sets. More isn't always better. Just most of the time.
-
-6. But wait, this plan is 9 weeks long...
-And the challenge is 8 weeks. That's okay. Take it easy perhaps for the
-few days before the final testing day. Skip the deadlifts for sure.

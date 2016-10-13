@@ -57,6 +57,7 @@ class LiftForm(Form):
 
 class Squat531Session(Session):
     """Squat session generator for 531."""
+    name = "Squat"
     elements = ([WendlerSomething, "Squat"],
                 [JokerSomething, "Squat"],
                 [FirstSetLastSomething, "Squat"])
@@ -64,6 +65,7 @@ class Squat531Session(Session):
 
 class Deadlift531Session(Session):
     """Deadlift session generator for 531."""
+    name = "Deadlift"
     elements = ([WendlerSomething, "Deadlift"],
                 [JokerSomething, "Deadlift"],
                 [FirstSetLastSomething, "Deadlift"])
@@ -71,6 +73,7 @@ class Deadlift531Session(Session):
 
 class Press531Session(Session):
     """Press session generator for 531."""
+    name = "Press"
     elements = (
         [WendlerSomething, "Press"],
         [JokerSomething, "Press"],
@@ -80,6 +83,7 @@ class Press531Session(Session):
 
 class BenchPress531Session(Session):
     """Bench press session generator for 531."""
+    name = "Bench Press"
     elements = (
         [WendlerSomething, "Bench Press"],
         [JokerSomething, "Bench Press"],
@@ -98,7 +102,15 @@ def index():
     form = LiftForm()
     if form.validate_on_submit() and form.submit.data:
         cycle = generate_program(form)
-        return render_template("Program.html", cycle=cycle)
+        with open("notes.txt") as ifile:
+            notes = ifile.read()
+        meta = {"Generated from PRs": "Squat {}, Press {}, Deadlift {}, "
+                "Bench press {}".format(form.squat.data, form.press.data,
+                form.deadlift.data, form.bench_press.data)}
+        meta["Light Program Jumps"] = str(form.light.data)
+        meta["Barbell Used"] = form.bar_type.data
+        return render_template("Program.html", cycle=cycle, notes=notes,
+                               name=form.name.data, meta=meta)
     else:
         print form.errors
 
@@ -107,6 +119,7 @@ def index():
 
 def generate_program(form):
     """Generate a training cycle based on form data."""
+    # TODO: Move up
     name = form.name.data
     initial_scale = 0.9
 

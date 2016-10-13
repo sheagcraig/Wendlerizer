@@ -5,18 +5,29 @@
 	<link rel="stylesheet" href="{{ url_for('.static', filename='styles/style.css') }}">
 {% endblock %}
 {% block content %}
-	<div class="container">
+	<div class="container program">
 		<div class='page-header'>
-			<h1>The Wendlerizer <small>Mad gains since 2013</small></h1>
+			<h1>The Wendlerizer <small>CrossFit Local Total Challenge 2016</small></h1>
 		</div>
 		<div>
+			<div class='row'>
+				<div class='col-md-6 session'>
+					<h3>Program for {{ name }}</h3>
+					<ul>
+					{% for key in meta %}
+						<li>{{ key }}: {{ meta[key] }}</li>
+					{% endfor %}
+					</ul>
+				</div>
+			</div>
 			{% set headings = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" %}
 			{% for week in cycle %}
 				<h4>Week {{ loop.index }}</h4>
-				{% for session in week %}
 					<div class='row'>
-						<div class='col-md-4 session'>
-							{% for element in session %}
+					{% for session in week %}
+						<div class='col-md-6 session'>
+							<h4>{{ session[0] }} Session</h4>
+							{% for element in session[1] %}
 								<p>
 								{% if element[0] is string %}
 									{{ headings[loop.index - 1] }}. 
@@ -50,13 +61,14 @@
 								{% endif %}
 							{% endfor %}
 						</div>
-					</div>
 				{% endfor %}
-				<hr/>
+			</div>
 			{% endfor %}
 		</div>
 		<div class='row'>
-			<div class='col-md-5 box'>
+			<div class='col-md-12'>
+				<pre>{{ notes }}</pre>
+				<img src="{{ url_for('.static', filename='images/taco.gif') }}">
 			</div>
 		</div>
 	</div>

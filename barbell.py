@@ -250,6 +250,7 @@ class Session(object):
     """Represents a series of training sessions."""
 
     elements = []
+    name = "Session"
 
     def __init__(self, lifts):
         self.element_generators = []
@@ -290,7 +291,7 @@ class Session(object):
                 result.append(sub_result)
             else:
                 result.append(element.next())
-        return result
+        return (self.name, result)
 
 
 class Mesocycle(object):
