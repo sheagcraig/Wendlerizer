@@ -22,7 +22,8 @@ from flask import (Flask, request, redirect, render_template, url_for,
                    session, flash)
 from flask_bootstrap import Bootstrap
 from flask_wtf import Form
-from wtforms import BooleanField, IntegerField, StringField, SubmitField
+from wtforms import (BooleanField, IntegerField, RadioField, StringField,
+                     SubmitField)
 from wtforms.validators import Required, NoneOf
 
 from barbell import (Lift, WendlerSomething, JokerSomething,
@@ -48,6 +49,9 @@ class LiftForm(Form):
     bench_press = IntegerField("Bench Press")
     deadlift = IntegerField("Deadlift")
     light =  BooleanField("Make small jumps?")
+    bar_type = RadioField("Barbell size", validators=[Required()], choices=[
+        (45.0, "Standard barbell"), (33.0, "Women's barbell")], default=45.0,
+        coerce=float)
     submit = SubmitField("Get Wendlerized")
 
 
@@ -93,9 +97,10 @@ def index():
     """Extract lift info from user."""
     form = LiftForm()
     if form.validate_on_submit() and form.submit.data:
-        #return "<pre>{}</pre>".format(generate_program(form))
         cycle = generate_program(form)
         return render_template("Program.html", cycle=cycle)
+    else:
+        print form.errors
 
     return render_template("Wendlerizer.html", form=form)
 
@@ -110,22 +115,28 @@ def generate_program(form):
     large_increment = 5.0 if light else 10.0
     small_increment = 2.5 if light else 5.0
 
-    squat = Lift("Squat", form.squat.data, initial_scale, large_increment)
-    press = Lift("Press", form.press.data, initial_scale, small_increment)
-    deadlift = Lift("Deadlift", form.deadlift.data, initial_scale,
-                    large_increment)
-    bench_press = Lift("Bench Press", form.bench_press.data,
-                               initial_scale, small_increment)
+    # Use the correct barbell size.
+    barbell_weight = form.bar_type.data
 
+    squat = Lift("Squat", form.squat.data, initial_scale, large_increment,
+                 barbell_weight)
+    press = Lift("Press", form.press.data, initial_scale, small_increment,
+                 barbell_weight)
+    deadlift = Lift("Deadlift", form.deadlift.data, initial_scale,
+                    large_increment, barbell_weight)
+    bench_press = Lift("Bench Press", form.bench_press.data,
+                               initial_scale, small_increment, barbell_weight)
+
+    # Instantiate all of the Lifts used in the program.
     pull_up = Lift("Pull Up", None)
     db_row = Lift("DB Row", None)
     curl = Lift("Barbell Curl", None)
     tricep_ext = Lift("Barbell OH Tricep Extension", None)
     core = Lift("Core", None)
+    lifts = [squat, press, deadlift, bench_press, pull_up, db_row, curl,
+             tricep_ext, core]
 
-    cycle = WendlerCycle(
-        [squat, press, deadlift, bench_press, pull_up, db_row, curl,
-         tricep_ext, core])
+    cycle = WendlerCycle(lifts)
 
     # TODO: It would be nice to have something to send to the template about
     # what the current TM's are per week, the user's name, the light value, etc.
