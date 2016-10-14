@@ -48,10 +48,12 @@ class LiftForm(Form):
     press = IntegerField("Press")
     bench_press = IntegerField("Bench Press")
     deadlift = IntegerField("Deadlift")
-    light =  BooleanField("Make small jumps?")
+    units = RadioField("Units", validators=[Required()], choices=[
+        ("kilograms", "Kilograms"), ("pounds", "Pounds")], default="pounds")
     bar_type = RadioField("Barbell size", validators=[Required()], choices=[
         (45.0, "Standard barbell"), (33.0, "Women's barbell")], default=45.0,
         coerce=float)
+    light =  BooleanField("Make small jumps?")
     submit = SubmitField("Get Wendlerized")
 
 
@@ -109,8 +111,13 @@ def index():
         meta = {"Generated from PRs": "Squat {}, Press {}, Deadlift {}, "
                 "Bench press {}".format(form.squat.data, form.press.data,
                 form.deadlift.data, form.bench_press.data)}
+        meta["Units Used"] = form.units.data
+        if form.units.data == "kilograms":
+            barbell = 20 if form.bar_type.data == 45.0 else 15
+        else:
+            barbell = form.bar_type.data
+        meta["Barbell Used"] = barbell
         meta["Light Program Jumps"] = str(form.light.data)
-        meta["Barbell Used"] = form.bar_type.data
         return render_template("ProgramWithNotes.html", cycles=cycle,
                                name=form.name.data, meta=meta)
     else:
@@ -121,17 +128,21 @@ def index():
 
 def generate_program(form):
     """Generate a training cycle based on form data."""
-    # TODO: Move up
-    name = form.name.data
     initial_scale = 0.9
-
-    # Manage the size of the jumps based on the "Light" form toggle.
     light = form.light.data
-    large_increment = 5.0 if light else 10.0
-    small_increment = 2.5 if light else 5.0
+    units = form.units.data
 
-    # Use the correct barbell size.
-    barbell_weight = form.bar_type.data
+    # Set everything up for using the different units.
+    if units == "Kilograms":
+        precision = 2.0
+        barbell_weight = 15.0 if form.bar_type.data == 33.0 else 20.0
+        large_increment = 5.0 if light else 10.0
+        small_increment = 2.5 if light else 5.0
+    else:
+        precision = 5.0
+        barbell_weight = form.bar_type.data
+        large_increment = 5.0 if light else 10.0
+        small_increment = 2.5 if light else 5.0
 
     squat = Lift("Squat", form.squat.data, initial_scale, large_increment,
                  barbell_weight)

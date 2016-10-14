@@ -16,7 +16,7 @@
 				<dl>
 					{% for key in meta %}
 					<dt>{{ key }}</dt>
-					<dd>{{ meta[key] }}</dd>
+					<dd>{{ meta[key]|title }}</dd>
 					{% endfor %}
 				</dl>
 			</div>
@@ -28,7 +28,7 @@
 			{% for lift_type, training_max in cycle["training_maxes"].items() %}
 			{% if training_max %}
 			<dt>{{ lift_type }}</dt>
-			<dd>{{ training_max|int }} (5%: {{ (training_max * 0.05)|int }}, 10% {{ (training_max * 0.1)|int }})</dd>
+			<dd>{{ training_max|int }} (Joker 5-10%: {{ (training_max * 0.05)|int }}-{{ (training_max * 0.1)|int }})</dd>
 			{% endif %}
 			{% endfor %}
 		</dl>
@@ -48,7 +48,7 @@
 					{% for set in element[1] -%}
 					{{ comma() }}
 					{% if set[0] %}
-					{{ set[0] }} x
+					{{ set[0]|int }} x
 					{% endif %}
 					{{ set[1] -}}
 					{% endfor %}
@@ -63,7 +63,7 @@
 					{% for set in sub_element[1] -%}
 					{{ comma() }}
 					{% if set[0] %}
-					{{ set[0] }} x
+					{{ set[0]|int }} x
 					{% endif %}
 					{{ set[1] -}}
 					{% endfor %}

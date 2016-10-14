@@ -203,48 +203,6 @@ class Element(object):
 
         return (self.lift.lift_type, zip(load_queue, scheme_queue))
 
-    def old_elements(self):
-        # load_coefficients ultimately determine the number of sessions.
-        # Duplicate the schemes provided if needed so they match in length,
-        # otherwise zip truncates to the shorter of the two.
-        # TODO: Rename things for clarity
-        num_sessions = len(self.load_coefficients)
-        rep_scheme_scale = num_sessions / len(self.scheme)
-        if num_sessions % len(self.scheme) > 0:
-            rep_scheme_scale += 1
-        rep_queue = self.scheme * rep_scheme_scale
-
-        # As per above, the load coefficients run the show. For individual
-        # sets, each load_coefficient at this level determines one set.
-        # If the rep scheme length is different, repeat the pattern until the
-        # lengths are suitable to exhaust the load_coefficient.
-        # TODO: Rename things for clarity
-        #while True:
-            # TODO: This could be clearer. Now that we're going to loop
-            # indefinitely, just manage that rather than making this
-            # zipped list.
-        for load, scheme in zip(self.load_coefficients, rep_queue):
-            result = []
-            scheme_scale = len(load) / len(scheme)
-            if len(load) % len(scheme) > 0:
-                scheme_scale += 1
-            scheme_queue = scheme * scheme_scale
-
-            for set_load, set_reps in zip(load, scheme_queue):
-                if isinstance(set_load, float):
-                    result.append(
-                        (round_weight(set_load * self.lift.training_max),
-                         set_reps))
-                else:
-                    result.append((set_load, set_reps))
-
-            # Manage state.
-            self.session_index += 1
-            if self.session_index > num_sessions:
-                self.session_index = 0
-
-            return result
-
 
 class Session(object):
     """Represents a series of training sessions."""
@@ -415,49 +373,61 @@ class CoreWork(Element):
 
 # Helper funcs
 
-def round_weight(weight, precision=5.0, barbell_weight=45.0):
-    """Round a weight to the nearest (doubled) plate size.
+def round_weight(weight, barbell_weight=45.0, precision=None):
+    """Round a weight to the nearest loadable plate combination.
 
-    Given a weight, round to the nearest available
-    combination of plates. For example, if the smallest plates
-    available are 2.5# plates, the precision is thus 5 (2.5 * 2).
+    This function makes some guesses about minimum plate size if one
+    isn't specified based on the barbell_weight value. Not everyone
+    may have access to fractionals, so you may have to specify the
+    precision to meet your needs.
 
     If you just want to avoid micro-loading, set the precision to the
     smallest increment you want to use.
 
-    Note: This function has no concept of units. Switching between
-    pounds and kilos for the purposes of this function is about
-    specifying the precision.
+    Note: The math is the same for kilos or pounds. If you are working
+    in kilos, make sure to specify the barbell_weight in kilos, and
+    specify the precision needed, and vice versa.
 
     e.g. round_weight(103.5) = 105
          round_weight(103.5, 2.0) = 104
          round_weight(101.5) = 100
-         round_weight(101, precision=5.0, barbell_weight=33) = 103
+         Imperial Women's Bar:
+         round_weight(101, barbell_weight=33) = 103
+         Kilos:
+         round_weight(101.7, barbell_weight=20) = 102
+         Kilos, but with no fractionals:
+         round_weight(101.7, barbell_weight=20, precision=5.0) = 100
 
     Args:
         weight (number): The weight to round to the nearest plate combo.
-        precision (number): The smallest increment available for plate
-            changes. Default is "5.0", based on standard 2.5# sets.
-            People from the modern world will probably want 1.0 for 0.5kg
-            fractionals.
         barbell_weight (number): The weight of the barbell in the same
             units as the rounded weight. It defaults to the fantasy
-            value of 45 which everyone uses even though standard bars are
-            actually 20kg.
+            value of 45.0 which everyone uses even though standard bars
+            are actually 20kg/44lbs.
+        precision (number): The smallest increment available for plate
+            changes. If a barbell_weight is specified that looks like it
+            is in pounds, it defaults to "5.0" (33, 35, 44, or 45 or
+            float equivalents), otherwise it uses "1.0".
 
     Returns:
-        int rounded weight value to the nearest plate combination
+        Float rounded weight value to the nearest plate combination
         loadable for that bar. If the weight is less than the bar, the
         weight of the bar is returned.
     """
     plate_weight = weight - barbell_weight
-    if plate_weight < 0:
-        rounded_weight = barbell_weight
-    else:
-        rounded_weight = (
-            plate_weight + precision / 2 -
-            ((plate_weight + precision / 2) % precision) +
-            barbell_weight)
-    return int(rounded_weight)
-
-
+    if not precision:
+        # Consider weights to be in pounds if bar weight is specified
+        # as either the correct weight or the rounded convenience
+        # weight.
+        # Likewise, assume that 2.5's are the smallest weights
+        # available for imperial folks, and 1/2 kilo fractionals for
+        # kilo users.
+        if float(barbell_weight) in (33.0, 35.0, 44.0, 45.0):
+            precision = 5.0
+        else:
+            precision = 1.0
+    base = int(plate_weight / precision) * precision
+    rounded_up = base + precision
+    delta_down = plate_weight - base
+    delta_up = rounded_up - plate_weight
+    return barbell_weight + (base if delta_down < delta_up else rounded_up)
