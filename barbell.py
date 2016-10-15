@@ -260,6 +260,7 @@ class Microcycle(object):
     '''
     training_max_modulation = [None]
     sessions = []
+    length = 0
 
     def __init__(self, lifts):
         self.mod_index = 0
@@ -272,7 +273,7 @@ class Microcycle(object):
     def generate_cycle(self):
         # TODO: Nope
         cycle = []
-        for counter in xrange(3):
+        for counter in xrange(self.length):
             sessions = []
             for session in self._sessions:
                 sessions.append(session.next())
@@ -342,6 +343,11 @@ class WendlerSomething(Element):
     # After 3 session increase by 10, 3 more, increase by 10, then the
     # deload week do nothing.
     training_max_modulation = [(3, 10), (3, 10), (1, 0)]
+
+
+class WendlerDeloadSomething(Element):
+    load_coefficients = [(0.40, 0.50, 0.60)]
+    scheme = [(5, 5, 5)]
 
 
 class JokerSomething(Element):
