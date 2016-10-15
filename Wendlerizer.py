@@ -116,7 +116,7 @@ def index():
             barbell = 20.0 if form.bar_type.data == 45.0 else 15.0
         else:
             barbell = form.bar_type.data
-        meta["Barbell Used"] = barbell
+        meta["Barbell Used"] = int(barbell)
         meta["Light Program Jumps"] = str(form.light.data)
         return render_template("ProgramWithNotes.html", cycles=cycle,
                                name=form.name.data, meta=meta)
