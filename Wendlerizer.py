@@ -113,7 +113,7 @@ def index():
                 form.deadlift.data, form.bench_press.data)}
         meta["Units Used"] = form.units.data
         if form.units.data == "kilograms":
-            barbell = 20 if form.bar_type.data == 45.0 else 15
+            barbell = 20.0 if form.bar_type.data == 45.0 else 15.0
         else:
             barbell = form.bar_type.data
         meta["Barbell Used"] = barbell
@@ -133,13 +133,11 @@ def generate_program(form):
     units = form.units.data
 
     # Set everything up for using the different units.
-    if units == "Kilograms":
-        precision = 2.0
+    if units == "kilograms":
         barbell_weight = 15.0 if form.bar_type.data == 33.0 else 20.0
-        large_increment = 5.0 if light else 10.0
-        small_increment = 2.5 if light else 5.0
+        large_increment = 2.5 if light else 5.0
+        small_increment = 1.0 if light else 2.0
     else:
-        precision = 5.0
         barbell_weight = form.bar_type.data
         large_increment = 5.0 if light else 10.0
         small_increment = 2.5 if light else 5.0
