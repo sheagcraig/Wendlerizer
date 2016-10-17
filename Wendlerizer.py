@@ -164,10 +164,14 @@ def index():
     form = LiftForm()
     if form.validate_on_submit() and form.submit.data:
         cycle = generate_program(form)
-        meta = {"Generated from PRs": "Squat {}, Press {}, Deadlift {}, "
-                "Bench press {}".format(form.squat.data, form.press.data,
-                form.deadlift.data, form.bench_press.data)}
+        meta = {}
+        meta["Advanced"] = False
         meta["Units Used"] = form.units.data
+        unit = "kg" if form.units.data == "kilograms" else "lbs"
+        meta["Generated from PRs"] = (
+            "Squat {0} {4}, Press {1} {4}, Deadlift {2} {4}, Bench press {3} "
+            "{4}".format(form.squat.data, form.press.data, form.deadlift.data,
+                         form.bench_press.data, unit))
         if form.units.data == "kilograms":
             barbell = 20.0 if form.bar_type.data == 45.0 else 15.0
         else:
@@ -191,6 +195,7 @@ def run_advanced_program():
         calculate_key = ("Generated from PRs" if form.calculate_tms.data ==
                          "maxes" else "Generated from TMs")
         meta = {}
+        meta["Advanced"] = True
         meta["Units Used"] = form.units.data.title()
         unit = "kg" if form.units.data == "kilograms" else "lbs"
         meta[calculate_key] = (

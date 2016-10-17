@@ -81,7 +81,9 @@
 </div>
 <div class='row'>
 	<div class='col-md-12'>
-		{% include "ProgramNotes.html" %}
+		{% if not meta["Advanced"] %}
+			{% include "ProgramNotes.html" %}
+		{% endif %}
 		<img src="{{ url_for('.static', filename='images/taco.gif') }}">
 	</div>
 </div>
