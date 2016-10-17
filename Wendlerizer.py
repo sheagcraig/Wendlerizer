@@ -60,19 +60,23 @@ class LiftForm(Form):
 
 class AdvancedLiftForm(Form):
     """Form for getting lift 1RMs."""
+    calculate_tms =  RadioField(
+        choices=[("maxes", "Generate program based on 1 rep maxes"),
+                 ("tmaxes", "Generate a program based on existing training "
+                  "maxes")], default="maxes")
     name = StringField("Name", validators=[Required()])
     squat = IntegerField("Squat")
     press = IntegerField("Press")
     bench_press = IntegerField("Bench Press")
     deadlift = IntegerField("Deadlift")
-    calculate_tms =  BooleanField("Generate Training Max?", default=True)
     units = RadioField("Units", validators=[Required()], choices=[
         ("pounds", "Pounds"), ("kilograms", "Kilograms")], default="pounds")
     bar_type = RadioField("Barbell size", validators=[Required()], choices=[
         (45.0, "Standard barbell"), (33.0, "Women's barbell")], default=45.0,
         coerce=float)
     light =  BooleanField("Make small jumps?")
-    program_length = IntegerField("Number of 7 week microcycles to generate")
+    program_length = IntegerField("Number of Cycles", default=1,
+                                  validators=[Required()])
     submit = SubmitField("Get Wendlerized")
 
 
@@ -170,7 +174,7 @@ def index():
             barbell = form.bar_type.data
         meta["Barbell Used"] = int(barbell)
         meta["Light Program Jumps"] = str(form.light.data)
-        return render_template("ProgramWithNotes.html", cycles=cycle,
+        return render_template("Program.html", cycles=cycle,
                                name=form.name.data, meta=meta)
     else:
         print form.errors
@@ -184,22 +188,27 @@ def run_advanced_program():
     form = AdvancedLiftForm()
     if form.validate_on_submit() and form.submit.data:
         cycle = generate_advanced_program(form)
-        meta = {"Generated from PRs": "Squat {}, Press {}, Deadlift {}, "
-                "Bench press {}".format(form.squat.data, form.press.data,
-                form.deadlift.data, form.bench_press.data)}
-        meta["Units Used"] = form.units.data
+        calculate_key = ("Generated from PRs" if form.calculate_tms.data ==
+                         "maxes" else "Generated from TMs")
+        meta = {}
+        meta["Units Used"] = form.units.data.title()
+        unit = "kg" if form.units.data == "kilograms" else "lbs"
+        meta[calculate_key] = (
+            "Squat {0} {4}, Press {1} {4}, Deadlift {2} {4}, Bench press {3} "
+            "{4}".format(form.squat.data, form.press.data, form.deadlift.data,
+                         form.bench_press.data, unit))
         if form.units.data == "kilograms":
             barbell = 20.0 if form.bar_type.data == 45.0 else 15.0
         else:
             barbell = form.bar_type.data
         meta["Barbell Used"] = int(barbell)
         meta["Light Program Jumps"] = str(form.light.data)
-        return render_template("ProgramWithNotes.html", cycles=cycle,
+        return render_template("Program.html", cycles=cycle,
                                name=form.name.data, meta=meta)
     else:
         print form.errors
 
-    return render_template("Wendlerizer.html", form=form)
+    return render_template("Advanced.html", form=form)
 
 
 def generate_program(form):
@@ -253,7 +262,7 @@ def generate_program(form):
 
 def generate_advanced_program(form):
     """Generate a training cycle based on form data."""
-    initial_scale = 0.9 if form.calculate_tms.data else 1.0
+    initial_scale = 0.9 if form.calculate_tms.data == "maxes" else 1.0
     light = form.light.data
     units = form.units.data
 
@@ -289,7 +298,6 @@ def generate_advanced_program(form):
 
     cycle = WendlerCycle(lifts)
     deload_cycle = WendlerDeloadCycle(lifts)
-    import pdb; pdb.set_trace()
 
     # TODO: It would be nice to have something to send to the template about
     # what the current TM's are per week, the user's name, the light value, etc.

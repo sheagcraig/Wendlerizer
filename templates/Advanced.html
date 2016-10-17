@@ -1,0 +1,27 @@
+{% extends "WendlerizerBase.html" %}
+{% block instructions %}
+	<p>The advanced form gives you more customization options, as well as allowing for differing lengths of programs. It can be useful for generating new cycles based on existing training numbers or swapping out accessory lifts,</p>
+	<p>If you have already been following the 531 program, you should continue using your existing training maxes rather than recalculate a program based on new 1RMs. This program takes the long view for making progress over months, if not years. If you want to extend or create new cycles to follow your existing training, enter your current training maxes into the four lift boxes and the "Generate a program based on existing training maxes" option.</p>
+{% endblock %}
+
+{% block generator %}
+	<p><h2>Generate a Program</h2></p>
+	<p>Please enter your information below to generate a training program.</p>
+	<p>If you don't have a 1RM for a lift, please estimate it with the One Rep Max Calculator. </p>
+	{% import "bootstrap/wtf.html" as wtf %}
+	<!-- <form method="POST" action="/"> -->
+	{{ wtf.quick_form(form, form_type="horizontal") }}
+{% endblock %}
+
+{% block title %}The Wendlerizer{% endblock %}
+{% block styles %}
+	{{ super() }}
+	<link rel="stylesheet" href="{{ url_for('.static', filename='styles/style.css') }}">
+{% endblock %}
+
+{% block advanced %}
+<div class='col-md-5 box'>
+	<h2>Awesome</h2>
+	<p>Boring, but BIG.</p>
+</div>
+{% endblock %}

@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="{{ url_for('.static', filename='styles/style.css') }}">
 {% endblock %}
 {% block content %}
+{% set unit = "kg" if meta["Units Used"] == "kilograms" else "lbs" %}
 <div class="container program">
 	<div class='page-header'>
 		<h1>The Wendlerizer <small>CrossFit Local Total Challenge 2016</small></h1>
@@ -16,7 +17,7 @@
 				<dl>
 					{% for key in meta %}
 					<dt>{{ key }}</dt>
-					<dd>{{ meta[key]|title }}</dd>
+					<dd>{{ meta[key] }}</dd>
 					{% endfor %}
 				</dl>
 			</div>
@@ -28,7 +29,7 @@
 			{% for lift_type, training_max in cycle["training_maxes"].items() %}
 			{% if training_max %}
 			<dt>{{ lift_type }}</dt>
-			<dd>{{ training_max|int }} (Joker 5-10%: {{ (training_max * 0.05)|int }}-{{ (training_max * 0.1)|int }})</dd>
+			<dd>{{ training_max|int }} {{ unit }} (Joker 5-10%: {{ (training_max * 0.05)|int }}-{{ (training_max * 0.1)|int }} {{ unit }})</dd>
 			{% endif %}
 			{% endfor %}
 		</dl>
@@ -78,13 +79,11 @@
 	{% endfor %}
 	{% endfor %}
 </div>
-{% block notes %}
 <div class='row'>
-	<div class='col-md-6'>
-		{{ notes|safe }}
+	<div class='col-md-12'>
+		{% include "ProgramNotes.html" %}
 		<img src="{{ url_for('.static', filename='images/taco.gif') }}">
 	</div>
 </div>
-{% endblock %}
 </div>
 {% endblock %}

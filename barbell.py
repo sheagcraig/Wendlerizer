@@ -37,7 +37,7 @@ class Lift(object):
         self.lift_type = lift_type
         self.personal_record = personal_record
         if training_max:
-            if training_max < 1 and training_max > 0:
+            if training_max <= 1 and training_max >= 0:
                 # Training max is a percentage of the PR.
                 # TODO: Round to nearest plate size.
                 self.training_max = training_max * personal_record
