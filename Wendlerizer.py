@@ -181,7 +181,7 @@ def index():
         return render_template("Program.html", cycles=cycle,
                                name=form.name.data, meta=meta)
     else:
-        print form.errors
+        print(form.errors)
 
     return render_template("Wendlerizer.html", form=form)
 
@@ -211,7 +211,7 @@ def run_advanced_program():
         return render_template("Program.html", cycles=cycle,
                                name=form.name.data, meta=meta)
     else:
-        print form.errors
+        print(form.errors)
 
     return render_template("Advanced.html", form=form)
 
@@ -310,7 +310,7 @@ def generate_advanced_program(form):
     # TODO: I also need some way for people to drop-in old values and continue
     # their existing program if they want to keep going.
     result = []
-    for _ in xrange(num_of_cycles):
+    for _ in range(num_of_cycles):
         result.append(cycle.generate_cycle())
         cycle.increase_training_maxes()
         result.append(cycle.generate_cycle())

@@ -52,26 +52,26 @@ class TrainingProgram(object):
 
         self.plan = "Training Plan for %s\n\n" % self.name
         self.plan += "Based on 1RMs:\n"
-        self.plan += ", ".join("{}: {}".format(lift, weight) for lift, weight in self.PRs.items()) + "\n\n"
+        self.plan += ", ".join("{}: {}".format(lift, weight) for lift, weight in list(self.PRs.items())) + "\n\n"
         self.training_notes = []
 
     def read_PRs(self):
         '''Enter the necessary information for generating a training plan.'''
-        self.name = raw_input('Enter name: ')
+        self.name = input('Enter name: ')
         line()
         print("Input PR lift values. If a 1RM is not known, enter a rep max" \
               "like this '5x300' and it will be estimated.")
-        for lift in self.PRs.keys():
-            PR = raw_input('Enter %s 1RM: ' % lift)
+        for lift in list(self.PRs.keys()):
+            PR = input('Enter %s 1RM: ' % lift)
             if 'X' in PR.upper():
                 self.PRs[lift] = estimate_1RM(PR)
-                print("%s 1RM: %i" % (lift, self.PRs[lift]))
+                print(("%s 1RM: %i" % (lift, self.PRs[lift])))
             else:
                 self.PRs[lift] = int(PR)
 
     def generate_TMs(self):
         '''Generate the training maxes.'''
-        for key, value in self.PRs.items():
+        for key, value in list(self.PRs.items()):
             self.TMs[key] = round_weight(value * 0.9)
 
     def increment_TMs(self):
@@ -174,9 +174,9 @@ class TrainingProgram(object):
             self.plan += line() + '\n'
 
             self.plan += "Training Maxes:\n"
-            self.plan += ", ".join("{}: {}".format(lift, weight) for lift, weight in self.TMs.items()) + "\n\n"
+            self.plan += ", ".join("{}: {}".format(lift, weight) for lift, weight in list(self.TMs.items())) + "\n\n"
 
-            for lift, tm in self.TMs.items():
+            for lift, tm in list(self.TMs.items()):
                 element = 'A'
                 self.plan += "%s Workout\n" % lift
                 self.plan += "A. %s %s\n" % (
@@ -214,9 +214,9 @@ class TrainingProgram(object):
 
     def print_training_cycle(self):
         '''Print a nice screen output of training plan.'''
-        print(self.plan)
+        print((self.plan))
         for notes in self.training_notes:
-            print('\n\n%s' % notes)
+            print(('\n\n%s' % notes))
 
     def write_training_plan(self):
         '''Output a text file with training plan.'''
@@ -257,7 +257,7 @@ def generate_last_set_first_weight(tm, week, extra_args):
 
 def generate_boring_but_big_weight(tm, week, extra_args):
     '''Return the BBB weight to use. Defaults to 50%.'''
-    if not 'percentage' in extra_args.keys():
+    if not 'percentage' in list(extra_args.keys()):
         percentage = 0.5
     else:
         percentage = extra_args['percentage']

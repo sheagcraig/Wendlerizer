@@ -175,7 +175,7 @@ class Element(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         # load_coefficients ultimately determine the number of unique
         # sessions.
         if self.load_coefficient_index == len(self.load_coefficients):
@@ -196,12 +196,12 @@ class Element(object):
         scheme = self.scheme[self.scheme_index]
         self.scheme_index += 1
 
-        scheme_scale = len(load_queue) / len(scheme)
+        scheme_scale = int(len(load_queue) / len(scheme))
         if len(load_queue) % len(scheme) > 0:
             scheme_scale += 1
         scheme_queue = scheme * scheme_scale
 
-        return (self.lift.lift_type, zip(load_queue, scheme_queue))
+        return (self.lift.lift_type, list(zip(load_queue, scheme_queue)))
 
 
 class Session(object):
@@ -239,16 +239,16 @@ class Session(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         result = []
         for element in self.element_generators:
             if isinstance(element, list):
                 sub_result = []
                 for sub_element in element:
-                    sub_result.append(sub_element.next())
+                    sub_result.append(next(sub_element))
                 result.append(sub_result)
             else:
-                result.append(element.next())
+                result.append(next(element))
         return (self.name, result)
 
 
@@ -273,10 +273,10 @@ class Microcycle(object):
     def generate_cycle(self):
         # TODO: Nope
         cycle = []
-        for counter in xrange(self.length):
+        for counter in range(self.length):
             sessions = []
             for session in self._sessions:
-                sessions.append(session.next())
+                sessions.append(next(session))
             cycle.append(sessions)
 
         result = self.get_metadata()
