@@ -30,6 +30,14 @@ order!
   - static, templates: Flask support files.
   - requirements.txt: Pip requirements file for use in a Virtualenv.
 
+## Running it locally
+If you just want to run this thing and get a training plan, the `Wendlerizer` site code is pretty easy to run. All examples are given for *nix shells. Windows users, you should be able to translate this pretty easily.
+1. Install python3.
+2. `python3 -m venv venv` to create a virtual environment for the project.
+3. `source venv/bin/activate` to activate the virtualenv.
+4. `pip install -r requirements.txt` to install the dependencies.
+5. `python Wendlerizer.py` to run the web server and app.
+6. Visit http://localhost:8080 to view the app in your web browser.
 
 ## TODO
 - Complete rewrite of TrainingProgram.
